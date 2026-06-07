@@ -1,0 +1,6 @@
+{
+  "name": "ReactPlay Docs",
+  "description": "A developer-focused React learning platform with lessons, examples, quizzes, and an interactive code playground.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
