@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Play, RotateCcw, Copy, Save, Check, Terminal, FileCode, HardDrive } from "lucide-react";
+import { Play, RotateCcw, Copy, Save, Check, Terminal, FileCode, HardDrive, Sparkles } from "lucide-react";
 
 type PlaygroundProps = {
   playgroundCode: string;
@@ -356,6 +356,35 @@ export default function Playground({
     "VITE 6.2 BUNDLER: COMPILATION SUCCESSFUL",
     "HOOKS DIRECTIVES CONNECTED SUCCESSFULLY."
   ]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState("");
+
+  const explainWithAI = async () => {
+    setAiLoading(true);
+    setAiResult("");
+    setLogs((l) => [...l, "SENDING BUNDLED SOURCE TO SERVER-SIDE GEMINI REVIEW ENGINE..."]);
+    try {
+      const res = await fetch("/api/ai/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: playgroundCode })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAiResult(data.data);
+        setLogs((l) => [...l, "GEMINI ANALYSIS INGESTED AND RENDERED SUCCESSFULLY."]);
+      } else {
+        setAiResult(data.message || "Could not analyze the code.");
+        setLogs((l) => [...l, "ERROR: GEMINI REVIEW REQUEST DECLINED BY BACKEND SERVER."]);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setAiResult("API Server returned an error. Make sure the development server is up and responsive.");
+      setLogs((l) => [...l, "ERROR: CRITICAL TIMEOUT ATTEMPTING REMOTE AI HANDSHAKE."]);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Load selected template code on template mount
   useEffect(() => {
@@ -575,6 +604,58 @@ export default function Playground({
 
       </div>
 
+      {/* Gemini AI Code Analyzer & Companion */}
+      <div className="mt-8 bg-black text-white border-4 border-black p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+        <div className="flex items-center justify-between border-b-2 border-neutral-700 pb-4 mb-4 flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="text-[#00FF00]" size={20} />
+            <h3 className="font-extrabold text-sm uppercase text-[#00FF00]">
+              GEMINI AI CODE ANALYZER & INSTANT REVIEWER
+            </h3>
+          </div>
+          <span className="text-[9px] bg-[#00FF00] text-black px-2 py-0.5 font-black uppercase">
+            POWERED BY GEMINI 3.5 FLASH
+          </span>
+        </div>
+
+        <p className="text-[11px] text-neutral-400 font-semibold mb-4 leading-relaxed">
+          Need a thorough React 19 audit, typescript check, or error reviews on your current playground code? Send it to our secure server-side Gemini system.
+        </p>
+
+        <div className="flex flex-col md:flex-row gap-4">
+          <button
+            type="button"
+            onClick={explainWithAI}
+            disabled={aiLoading}
+            className="px-5 py-3 bg-[#00FF00] hover:bg-black hover:text-[#00FF00] hover:border-[#00FF00] text-black border-2 border-white font-black text-xs uppercase cursor-pointer disabled:bg-neutral-800 disabled:text-neutral-500 disabled:border-neutral-700 transition-all flex items-center gap-2 justify-center"
+          >
+            {aiLoading ? (
+              <span className="w-3.5 h-3.5 border-2 border-neutral-500 border-t-black rounded-full animate-spin"></span>
+            ) : null}
+            <span>{aiLoading ? "ANALYZING BUNDLED COMPONENT CODE..." : "⚡ RUN AI CODE REVIEW"}</span>
+          </button>
+        </div>
+
+        {aiResult && (
+          <div className="mt-6 bg-neutral-900 border border-neutral-800 p-5 font-mono text-xs rounded-none animate-fade-in text-neutral-200">
+            <div className="flex justify-between items-center border-b border-neutral-800 pb-2 mb-3">
+              <span className="text-[9px] text-yellow-300 font-black tracking-widest uppercase block">
+                GEMINI INTEL SUMMARY
+              </span>
+              <button
+                onClick={() => setAiResult("")}
+                className="text-[9px] text-neutral-400 hover:text-white uppercase transition-colors px-1.5 py-0.5 bg-neutral-850 border border-neutral-700 cursor-pointer"
+              >
+                Clear [x]
+              </button>
+            </div>
+            <div className="text-[11px] leading-relaxed whitespace-pre-wrap font-mono text-neutral-200 bg-black p-3 border border-neutral-800 max-h-[450px] overflow-y-auto">
+              {aiResult}
+            </div>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
@@ -731,16 +812,31 @@ function FormSimulation() {
 function ApiSimulation() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [simStatus, setSimStatus] = useState<string>("");
 
-  const pullData = () => {
+  const pullData = async () => {
     setLoading(true);
-    setTimeout(() => {
+    setSimStatus("");
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const payload = await res.json();
+        setData(payload);
+        setSimStatus("REAL ENDPOINT QUERY FETCHED SUCCESSFULLY!");
+      } else {
+        throw new Error("API failed");
+      }
+    } catch (e) {
+      console.warn("Express user API endpoint failed, fallback to offline state simulations:", e);
+      // Traditional robust fallback
       setData([
-        { id: 1, name: "Sarad Bashyal", tech: "Nextjs Core" },
-        { id: 2, name: "Mark Dev", tech: "Zustand Pro" }
+        { id: 1, name: "Sarad Bashyal (Fallback)", tech: "Nextjs Core" },
+        { id: 2, name: "Mark Dev (Fallback)", tech: "Zustand Pro" }
       ]);
+      setSimStatus("OFFLINE LOCAL BACKUP ACTIVE");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -751,6 +847,11 @@ function ApiSimulation() {
           QUERY API
         </button>
       </div>
+      {simStatus && (
+        <span className={`text-[8px] font-black uppercase px-2 py-0.5 border block mb-2 text-center rounded-sm ${simStatus.includes("REAL") ? 'bg-[#00FF00]/10 border-green-600 text-green-700' : 'bg-yellow-300/20 border-yellow-600 text-yellow-800'}`}>
+          {simStatus}
+        </span>
+      )}
       {loading ? (
         <p className="text-center py-4 text-[10px] text-black font-black animate-pulse uppercase">PULLING REMOTE DATA FIELDS...</p>
       ) : data.length === 0 ? (

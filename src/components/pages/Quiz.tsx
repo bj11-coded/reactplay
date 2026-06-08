@@ -6,6 +6,7 @@ import { quizzesData } from "../../data/quizzes";
 type QuizProps = {
   saveQuizScore: (topic: string, score: number) => void;
   getBestQuizScore: (topic: string) => number;
+  allQuizzes?: QuizQuestion[];
 };
 
 const QUIZ_TOPICS = [
@@ -15,10 +16,15 @@ const QUIZ_TOPICS = [
   "State Quiz",
   "Hooks Quiz",
   "Routing Quiz",
-  "Advanced React Quiz"
+  "Advanced React Quiz",
+  "CSS Layouts Quiz"
 ];
 
-export default function Quiz({ saveQuizScore, getBestQuizScore }: QuizProps) {
+export default function Quiz({ 
+  saveQuizScore, 
+  getBestQuizScore,
+  allQuizzes = quizzesData
+}: QuizProps) {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   
   // Running state trackers
@@ -28,9 +34,15 @@ export default function Quiz({ saveQuizScore, getBestQuizScore }: QuizProps) {
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
   const [showFinishedCard, setShowFinishedCard] = useState(false);
 
+  // Compute union of topics
+  const dynamicTopics = Array.from(new Set([
+    ...QUIZ_TOPICS,
+    ...allQuizzes.map(q => q.topic)
+  ]));
+
   // Filter topics based on active selections
   const topicQuestions = activeTopic 
-    ? quizzesData.filter((q) => q.topic === activeTopic) 
+    ? allQuizzes.filter((q) => q.topic === activeTopic) 
     : [];
 
   const handleStartQuiz = (topic: string) => {
@@ -108,10 +120,19 @@ export default function Quiz({ saveQuizScore, getBestQuizScore }: QuizProps) {
       {/* Main flow branches */}
       {!activeTopic ? (
         /* View 1: Quiz selector dashboard listing user's historical best scores */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {QUIZ_TOPICS.map((topic) => {
+        allQuizzes.length === 0 ? (
+          <div className="border-4 border-dashed border-black bg-white p-12 text-center max-w-xl mx-auto shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] my-12" id="empty-state-quizzes">
+            <Brain className="mx-auto mb-4 text-black fill-[#00FF00] stroke-[2.5]" size={44} />
+            <h3 className="font-display font-black text-lg text-black uppercase tracking-tight">QUIZ BANK IS EMPTY</h3>
+            <p className="font-sans text-xs text-[#555] mt-2 font-bold leading-relaxed">
+              No diagnostic quizzes have been added yet. Please click the **Admin** tab at the top to write and publish real quizzes directly from the dashboard!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {dynamicTopics.filter(topic => allQuizzes.some(q => q.topic === topic)).map((topic) => {
             const bestScore = getBestQuizScore(topic);
-            const topicQuestionsCount = quizzesData.filter((q) => q.topic === topic).length;
+            const topicQuestionsCount = allQuizzes.filter((q) => q.topic === topic).length;
             const hasStarted = bestScore > 0;
 
             return (
@@ -166,6 +187,7 @@ export default function Quiz({ saveQuizScore, getBestQuizScore }: QuizProps) {
             );
           })}
         </div>
+        )
       ) : (
         /* View 2: Specific active quiz process viewport controller */
         <div className="max-w-2xl mx-auto">

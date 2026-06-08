@@ -13,6 +13,7 @@ type DocsProps = {
   isLessonCompleted: (id: string) => boolean;
   setCurrentTab: (tab: string) => void;
   setPlaygroundCode: (code: string) => void;
+  allLessons?: Lesson[];
 };
 
 export default function Docs({
@@ -21,7 +22,8 @@ export default function Docs({
   toggleLessonCompleted,
   isLessonCompleted,
   setCurrentTab,
-  setPlaygroundCode
+  setPlaygroundCode,
+  allLessons = lessonsData
 }: DocsProps) {
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,8 +33,8 @@ export default function Docs({
   const [showInterviewAnswer, setShowInterviewAnswer] = useState(false);
 
   // Fallback to first lesson if none is selected
-  const activeLessonId = selectedLessonId || lessonsData[0]?.id || "";
-  const activeLesson = lessonsData.find((l) => l.id === activeLessonId) || lessonsData[0];
+  const activeLessonId = selectedLessonId || allLessons[0]?.id || "";
+  const activeLesson = allLessons.find((l) => l.id === activeLessonId) || allLessons[0];
 
   // References for scrolling
   const explanationRef = useRef<HTMLDivElement>(null);
@@ -63,16 +65,16 @@ export default function Docs({
   };
 
   // Filter lessons based on key filters
-  const filteredLessons = lessonsData.filter((l) =>
+  const filteredLessons = allLessons.filter((l) =>
     l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.explanation.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Prev / Next logic handlers
-  const activeIndex = lessonsData.findIndex((l) => l.id === activeLessonId);
-  const prevLesson = activeIndex > 0 ? lessonsData[activeIndex - 1] : null;
-  const nextLesson = activeIndex < lessonsData.length - 1 ? lessonsData[activeIndex + 1] : null;
+  const activeIndex = allLessons.findIndex((l) => l.id === activeLessonId);
+  const prevLesson = activeIndex > 0 ? allLessons[activeIndex - 1] : null;
+  const nextLesson = activeIndex < allLessons.length - 1 ? allLessons[activeIndex + 1] : null;
 
   const scrollToSection = (elementRef: React.RefObject<HTMLDivElement | null>) => {
     elementRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -101,7 +103,7 @@ export default function Docs({
         <div className="text-[11px] text-black font-bold uppercase flex items-center space-x-2 bg-yellow-300 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           <span>PROGRESS DETECTOR:</span>
           <span className="text-black font-black">
-            {lessonsData.filter((l) => isLessonCompleted(l.id)).length} OF {lessonsData.length} TOPICS MASTERED
+            {allLessons.filter((l) => isLessonCompleted(l.id)).length} OF {allLessons.length} TOPICS MASTERED
           </span>
         </div>
       </div>
@@ -213,10 +215,61 @@ export default function Docs({
             <h3 className="text-xs font-black border-b-2 border-black pb-2 uppercase tracking-wide text-black">
               CONCEPTUAL EXPLANATION
             </h3>
-            <p className="font-sans text-xs sm:text-sm text-neutral-800 leading-relaxed font-bold">
+            <p className="font-sans text-xs sm:text-sm text-neutral-800 leading-relaxed font-bold whitespace-pre-line">
               {activeLesson.explanation}
             </p>
           </section>
+
+          {/* Section: Subsections block (if defined) */}
+          {activeLesson.subsections && activeLesson.subsections.length > 0 && (
+            <section className="space-y-6">
+              <h3 className="text-xs font-black border-b-2 border-black pb-2 uppercase tracking-wide text-black">
+                CURRICULUM SUBSECTIONS & TOPICS
+              </h3>
+              
+              <div className="space-y-6">
+                {activeLesson.subsections.map((sub, sIdx) => (
+                  <div key={sIdx} className="border-3 border-black bg-stone-50 p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] space-y-3">
+                    <h4 className="font-sans font-black text-xs sm:text-sm uppercase text-purple-800 border-b border-black pb-1.5 flex items-center justify-between">
+                      <span>{sub.title}</span>
+                      <span className="text-[9px] bg-purple-100 text-purple-800 border-2 border-black px-1.5 py-0.5 font-black font-mono shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                        SUB-SECTION {sIdx + 1}
+                      </span>
+                    </h4>
+                    <p className="font-sans text-xs text-neutral-800 leading-relaxed font-bold whitespace-pre-line">
+                      {sub.content}
+                    </p>
+                    
+                    {sub.exampleCode && (
+                      <div className="space-y-2 pt-1">
+                        <div className="flex justify-between items-center bg-zinc-900 border-2 border-black px-3 py-1">
+                          <span className="text-[9px] text-[#00FF00] font-bold font-mono">SUB-EXAMPLE CODE</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(sub.exampleCode || "")}
+                            className="text-[9px] text-white hover:text-[#00FF00] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+                          >
+                            <Copy size={9} />
+                            <span>Copy Code</span>
+                          </button>
+                        </div>
+                        <pre className="text-[10px] text-[#00FF00] bg-black p-3.5 overflow-x-auto select-all leading-relaxed font-mono whitespace-pre border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                          {sub.exampleCode}
+                        </pre>
+                      </div>
+                    )}
+                    
+                    {sub.exampleExplanation && (
+                      <div className="bg-yellow-300/10 border-l-4 border-yellow-400 p-3 text-[10px] text-zinc-700 font-bold font-mono border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="text-black uppercase text-[8px] font-black block mb-0.5">ANALYSIS & WALKTHROUGH:</span>
+                        {sub.exampleExplanation}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Section: Syntax */}
           <section className="space-y-3 bg-white border-4 border-black p-5 font-mono shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">

@@ -6,27 +6,32 @@ import { projectsData } from "../../data/projects";
 type ProjectsProps = {
   setPlaygroundCode: (code: string) => void;
   setCurrentTab: (tab: string) => void;
+  allProjects?: Project[];
 };
 
-export default function Projects({ setPlaygroundCode, setCurrentTab }: ProjectsProps) {
+export default function Projects({ 
+  setPlaygroundCode, 
+  setCurrentTab,
+  allProjects = projectsData
+}: ProjectsProps) {
   const [activeTab, setActiveTab] = useState<"ALL" | "Beginner" | "Intermediate" | "Advanced">("ALL");
   const [copiedProjectId, setCopiedProjectId] = useState<string | null>(null);
   const [expandedStarterId, setExpandedStarterId] = useState<string | null>(null);
 
   const handleCopyStarter = (proj: Project) => {
-    navigator.clipboard.writeText(proj.starterCode);
+    navigator.clipboard.writeText(proj.starterCode || "");
     setCopiedProjectId(proj.id);
     setTimeout(() => setCopiedProjectId(null), 2000);
   };
 
   const handleLoadStarterInPlayground = (proj: Project) => {
-    setPlaygroundCode(proj.starterCode);
+    setPlaygroundCode(proj.starterCode || "");
     setCurrentTab("playground");
   };
 
   const filteredProjects = activeTab === "ALL"
-    ? projectsData
-    : projectsData.filter((p) => p.level === activeTab);
+    ? allProjects
+    : allProjects.filter((p) => p.level === activeTab);
 
   return (
     <div className="min-h-screen text-black font-mono animate-fade-in py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -183,8 +188,12 @@ export default function Projects({ setPlaygroundCode, setCurrentTab }: ProjectsP
         })}
 
         {filteredProjects.length === 0 && (
-          <div className="text-center py-20 text-neutral-700 bg-white border-4 border-dashed border-black font-black text-xs uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            NO CHALLENGES CONFIGURED FOR THIS CURRICULUM SEGMENT.
+          <div className="border-4 border-dashed border-black bg-white p-12 text-center max-w-xl mx-auto shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] my-6" id="empty-state-projects">
+            <Award className="mx-auto mb-4 text-black fill-[#00FF00] stroke-[2.5]" size={44} />
+            <h3 className="font-display font-black text-lg text-black uppercase tracking-tight">Challenge Labs is Empty</h3>
+            <p className="font-sans text-xs text-[#555] mt-2 font-bold leading-relaxed">
+              No guided coding challenges have been loaded yet. Please click the **Admin** tab at the top to write and publish starter templates and specs directly from the dashboard!
+            </p>
           </div>
         )}
       </div>

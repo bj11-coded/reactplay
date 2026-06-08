@@ -6,6 +6,7 @@ import { snippetsData } from "../../data/snippets";
 type SnippetsProps = {
   setPlaygroundCode: (code: string) => void;
   setCurrentTab: (tab: string) => void;
+  allSnippets?: Snippet[];
 };
 
 const SNIPPET_CATEGORIES = [
@@ -18,7 +19,11 @@ const SNIPPET_CATEGORIES = [
   "Protected Route"
 ];
 
-export default function Snippets({ setPlaygroundCode, setCurrentTab }: SnippetsProps) {
+export default function Snippets({ 
+  setPlaygroundCode, 
+  setCurrentTab,
+  allSnippets = snippetsData
+}: SnippetsProps) {
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
 
@@ -33,10 +38,17 @@ export default function Snippets({ setPlaygroundCode, setCurrentTab }: SnippetsP
     setCurrentTab("playground");
   };
 
+  // Compute union of categories dynamically
+  const dynamicCategories = Array.from(new Set([
+    "ALL",
+    ...SNIPPET_CATEGORIES.filter(c => c !== "ALL"),
+    ...allSnippets.map(s => s.category)
+  ]));
+
   // Filter snippets based on active categorizations
   const filteredSnippets = activeCategory === "ALL"
-    ? snippetsData
-    : snippetsData.filter((s) => s.category === activeCategory);
+    ? allSnippets
+    : allSnippets.filter((s) => s.category === activeCategory);
 
   return (
     <div className="min-h-screen text-black font-mono animate-fade-in py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -54,7 +66,7 @@ export default function Snippets({ setPlaygroundCode, setCurrentTab }: SnippetsP
 
       {/* Category filters banner */}
       <div className="flex flex-wrap gap-2.5 mb-10 border-b-4 border-black pb-6">
-        {SNIPPET_CATEGORIES.map((cat) => {
+        {dynamicCategories.map((cat) => {
           const active = activeCategory === cat;
           return (
             <button
@@ -143,8 +155,12 @@ export default function Snippets({ setPlaygroundCode, setCurrentTab }: SnippetsP
         })}
 
         {filteredSnippets.length === 0 && (
-          <div className="md:col-span-2 text-center py-16 text-neutral-700 bg-white border-4 border-dashed border-black font-black uppercase text-xs uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            NO COMPATIBLE SNIPPETS RESIDE IN THIS SPECS SECTION.
+          <div className="md:col-span-2 border-4 border-dashed border-black bg-white p-12 text-center max-w-xl mx-auto shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] my-6" id="empty-state-snippets">
+            <Layers className="mx-auto mb-4 text-black fill-[#00FF00] stroke-[2.5]" size={44} />
+            <h3 className="font-display font-black text-lg text-black uppercase tracking-tight">Snippet Directory is Empty</h3>
+            <p className="font-sans text-xs text-[#555] mt-2 font-bold leading-relaxed">
+              No UI widgets have been added yet. Please click the **Admin** tab at the top to write and publish widgets directly from the dashboard!
+            </p>
           </div>
         )}
       </div>

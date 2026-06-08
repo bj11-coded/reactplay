@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Safety Net (Default-Deny Catch-All)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Core Reusable Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() 
+        && request.auth.token.email == "chy.bijay.890@gmail.com" 
+        && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Entity-Specific Input Blueprint Enforcement
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'email']) 
+        && data.keys().size() <= 6
+        && data.uid is string
+        && data.uid.size() <= 128
+        && data.email is string
+        && data.email.size() <= 256
+        && (!data.keys().hasAny(['completedLessons']) || (data.completedLessons is list && data.completedLessons.size() <= 500))
+        && (!data.keys().hasAny(['completedQuizzes']) || (data.completedQuizzes is map && data.completedQuizzes.size() <= 100))
+        && (!data.keys().hasAny(['savedPlaygroundCode']) || (data.savedPlaygroundCode is string && data.savedPlaygroundCode.size() <= 262144))
+        && (!data.keys().hasAny(['updatedAt']) || data.updatedAt is timestamp);
+    }
+
+    function isValidLesson(data) {
+      return data.keys().hasAll(['id', 'title', 'level', 'description', 'explanation'])
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 256
+        && data.level is string && (data.level == 'Beginner' || data.level == 'Intermediate' || data.level == 'Advanced')
+        && data.description is string && data.description.size() <= 2000
+        && data.explanation is string && data.explanation.size() <= 20000;
+    }
+
+    function isValidQuizQuestion(data) {
+      return data.keys().hasAll(['id', 'question', 'options', 'answerIndex', 'explanation', 'topic'])
+        && data.id is string && data.id.size() <= 128
+        && data.question is string && data.question.size() <= 2000
+        && data.options is list && data.options.size() <= 10
+        && data.answerIndex is int && data.answerIndex >= 0 && data.answerIndex < 10
+        && data.explanation is string && data.explanation.size() <= 10000
+        && data.topic is string && data.topic.size() <= 256;
+    }
+
+    function isValidSnippet(data) {
+      return data.keys().hasAll(['id', 'title', 'difficulty', 'description', 'category', 'code'])
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 256
+        && data.difficulty is string && (data.difficulty == 'Beginner' || data.difficulty == 'Intermediate' || data.difficulty == 'Advanced')
+        && data.description is string && data.description.size() <= 2000
+        && data.category is string && data.category.size() <= 128
+        && data.code is string && data.code.size() <= 131072;
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['id', 'title', 'level', 'description'])
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 256
+        && data.level is string && (data.level == 'Beginner' || data.level == 'Intermediate' || data.level == 'Advanced')
+        && data.description is string && data.description.size() <= 2000;
+    }
+
+    // 4. Fortress Rules for Collections
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming())
+        && incoming().uid == userId
+        && incoming().updatedAt == request.time;
+      
+      allow update: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming())
+        && incoming().uid == userId
+        && incoming().updatedAt == request.time
+        && incoming().uid == existing().uid
+        // Email and other core credentials must remain immutable
+        && incoming().email == existing().email;
+      
+      allow delete: if isOwner(userId);
+    }
+
+    match /lessons/{lessonId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(lessonId) && isValidLesson(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /quizzes/{quizId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(quizId) && isValidQuizQuestion(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /snippets/{snippetId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(snippetId) && isValidSnippet(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(projectId) && isValidProject(incoming());
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -1,604 +1,1081 @@
 import { Lesson } from "../types";
 
 export const lessonsData: Lesson[] = [
-  // BEGINNER LESSONS
   {
-    id: "what-is-react",
-    title: "What is React?",
+    id: "react-intro-jsx",
+    title: "1. Introduction to React & JSX",
     level: "Beginner",
-    description: "Learn the core concepts of React, its component-driven architecture, and virtual DOM mechanism.",
+    estimate: "8 mins",
+    description: "Learn about React's declarative nature, the Virtual DOM mechanism, and how to write dynamic components using JavaScript XML (JSX).",
+    explanation: "React is a modular component-based JavaScript library designed to build fast, responsive user interfaces. Instead of modifying the real Browser DOM directly (which is slow), React maintains a lightweight 'Virtual DOM' representation in memory. When state updates, React diffs this virtual copy with a brand-new one underneath and performs surgical updates on only the altered parts of the live page. JSX is a syntax extension that enables writing HTML-like tags side-by-side with JavaScript logic inside the same function.",
+    syntax: "const element = <h1 className=\"title\">Hello {username}!</h1>;",
+    code: `import React from 'react';
+
+export default function JSXSandbox() {
+  const portalName = "React Matrix Core";
+  const onlineCount = 42;
+  const metrics = { health: "100%", level: "Stable" };
+
+  return (
+    <div className="p-6 border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+      <div className="bg-[#00FF00]/10 border-2 border-black p-4 mb-4">
+        <h2 className="text-sm font-black uppercase text-black">🚀 Welcome to {portalName}</h2>
+        <p className="text-xs text-neutral-600 mt-1 font-bold">
+          JSX allows you to embed expressions directly inside curly braces \{\}.
+        </p>
+      </div>
+
+      <div className="space-y-2 text-xs">
+        <div className="flex justify-between border-b border-neutral-300 pb-1">
+          <span className="font-bold">System Status:</span>
+          <span className="text-green-600 font-black">{metrics.health}</span>
+        </div>
+        <div className="flex justify-between border-b border-neutral-300 pb-1">
+          <span className="font-bold">Virtual Nodes Online:</span>
+          <span className="bg-yellow-300 px-1 border border-black font-black">{onlineCount}</span>
+        </div>
+        <div className="flex justify-between border-b border-neutral-300 pb-1">
+          <span className="font-bold">Expression Parsing Test:</span>
+          <span className="font-black text-purple-700">2 + 2 = {2 + 2}</span>
+        </div>
+      </div>
+    </div>
+  );
+}`,
+    outputExplanation: "Compiles nested HTML tags directly returning a dynamic visual block. Variables, calculations, and object property values evaluate in real time without manual element lookups.",
+    practiceTask: "Add a new conditional expression that prints a warning label if onlineCount is less than 50.",
+    commonMistakes: "Forgetting that JSX components must return a single root element (wrap multiple siblings inside a Fragment '<></>'), or writing HTML attributes like 'class' instead of the camelCase counterpart 'className'.",
+    interviewQuestion: "What is the differences between the Real DOM and the Virtual DOM, and why is React's rendering mechanism efficient?",
+    miniQuiz: {
+      question: "Which of the following is true about JSX?",
+      options: [
+        "Browsers can execute JSX natively without compilation tools",
+        "It is a syntax extension that translates to React.createElement behind the scenes",
+        "JSX forces JavaScript developers to write CSS directly inside text attributes",
+        "Using curly braces in JSX is restricted only to basic numerical addition"
+      ],
+      answerIndex: 1,
+      explanation: "JSX is not standard JavaScript. Build compilers like Babel or ESBuild transform JSX tags into standard React.createElement function calls compiled for browsers."
+    },
+    subsections: [
+      {
+        title: "React Setup: CDN links v/s Professional Toolchains",
+        content: "React can be imported directly into any webpage using standard direct CDN tags for simple prototyping. However, for real-world enterprise applications, a modular bundler and toolchain setup (such as Vite or Create React App) is mandatory. The toolchain handles transpilation, code minification, Hot Module Replacement (HMR), and splits modules natively for optimal load speeds.",
+        exampleCode: `// CDN direct loading script injection example:
+// <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+// <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+// Modern ES6 Toolchain import model:
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(<h1>Enterprise Portal Booted via Vite</h1>);
+}`,
+        exampleExplanation: "CDN setups rely on global scripts exposing the 'React' namespace directly into window. Vite-based tooling resolves imports at compile-time and packages highly optimized bundles, omitting unreferenced functions."
+      },
+      {
+        title: "JSX Primitives & Interactive Element Rendering",
+        content: "JSX is a syntax extension that represents user interfaces directly utilizing standard markup tags merged with JavaScript expressions in curly braces {}. Under the hood, compilers transpile JSX tags into standard React.createElement() method calls, transforming the markup into immutable state trees of JavaScript descriptions. Attributes must adapt to JavaScript camelCase syntaxes (e.g., 'class' becomes 'className', 'onclick' becomes 'onClick').",
+        exampleCode: `import React from 'react';
+
+export function ElementRenderer() {
+  const elementId = "test-node-09";
+  const labelSuffix = "Interactive Primitives";
+  
+  return (
+    <div id={elementId} className="p-3 border-2 border-black bg-stone-50 text-xs font-mono">
+      <span className="font-extrabold uppercase decoration-dotted underline">Current module: {labelSuffix}</span>
+      <p className="mt-2 text-stone-500 font-bold">Dynamic evaluations: {4 * 10 + 2} virtual elements.</p>
+    </div>
+  );
+}`,
+        exampleExplanation: "Transpiles markup attributes natively to clean nodes. Variables and mathematical calculations resolve inside curly brackets instantly on render cycles."
+      },
+      {
+        title: "Virtual DOM & Core Structural Reconciliation",
+        content: "When state change occurs, React does not touch the browser DOM instantly. Instead, it computes a brand new lightweight Virtual DOM representation in memory. React compares this newly configured tree with the previous Virtual DOM layout utilizing a highly optimized diffing algorithm (the Fiber reconciler). This process, called Reconciliation, evaluates the exact minimal write actions required and updates only the matching live nodes, preventing reflow delays.",
+        exampleCode: `// Traditional real DOM rewrite (Unoptimized, forces reflow on all children):
+// document.getElementById('status-box').innerHTML = '<h2>New status</h2>';
+
+// React virtual DOM approach:
+// React internally diffs the changes like a git patch sequence before doing the DOM write.
+const newVirtualNode = <div className="p-2 bg-yellow-300">Updated Status Pane</div>;`,
+        exampleExplanation: "Direct innerHTML wipes out all nested nodes, dropping form inputs, cursor selections, and focus anchors. React's Virtual DOM surgically replaces changed elements only, retaining browser state."
+      }
+    ]
+  },
+  {
+    id: "functional-components",
+    title: "2. Functional vs Class Components",
+    level: "Beginner",
     estimate: "10 mins",
-    explanation: "React is a open-source JavaScript library developed by Meta for building modern user interfaces. Instead of modifying the browser's DOM directly, which is slow, React updates a 'Virtual DOM' in memory. When state updates, React calculates the minimal set of changes (diffing) and batche-updates the real DOM efficiently.",
-    syntax: "import React from 'react';\n// React components can be written as JavaScript functions returning JSX",
-    code: `function WelcomeMessage() {
-  return (
-    <div className="p-6 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <h1 className="text-2xl font-black tracking-tight text-black">HELLO BUILDER!</h1>
-      <p className="font-mono text-sm text-gray-700 mt-2">
-        Welcome to modular rendering. This component is isolated and reusable.
-      </p>
-    </div>
-  );
-}`,
-    outputExplanation: "Produces a beautifully styled alert-box shaped card on screen. Modifying text inside this function will dynamically re-render this visual block instantly without page reloads.",
-    practiceTask: "Add an extra paragraph element with your personal bio inside the WelcomeMessage component, and style lock it with font-mono.",
-    commonMistakes: "Remember that React components must always return a single root element (or use fragments like <>...</>) and must start with a capital letter (e.g., WelcomeMessage, not welcomeMessage).",
-    interviewQuestion: "What is the Virtual DOM and how does React's reconciliation engine work?",
-    miniQuiz: {
-      question: "Why does React use uppercase names for custom components?",
-      options: [
-        "To satisfy standard ESLint settings",
-        "React uses capitalization to distinguish custom components from standard browser elements (like div or main)",
-        "Uppercase words execute faster in the JS main thread",
-        "It is simply a recommendation and lowercase names run the exact same way"
-      ],
-      answerIndex: 1,
-      explanation: "Capitalized elements in JSX are compiled as variable references rather than literal HTML tags, enabling React to mount custom components."
-    }
-  },
-  {
-    id: "jsx",
-    title: "JSX Guide",
-    level: "Beginner",
-    description: "Understand JavaScript XML syntax, dynamic embedding, and styling attributes in JSX.",
-    estimate: "12 mins",
-    explanation: "JSX is a XML-like syntax extension to JavaScript that allows you to write HTML structures directly inside your JS code. It is compiled by Vite/Babel down to React.createElement() calls. In JSX, you can embed any valid JavaScript expressions using curly braces {}.",
-    syntax: "const element = <h1 className='text-3xl'>{dynamicValue}</h1>;",
-    code: `function DashboardCard() {
-  const user = { name: "Sarah Bashyal", role: "Software Architect" };
-  const getStatus = () => "ACTIVE";
+    description: "Understand the evolutionary path from static, lifecycle-heavy Class components to modern, functional React hooks paradigms.",
+    explanation: "Historically, React utilized ES6 Class components to declare internal state and handle component lifecycles. With modern React (v16.8+), Functional components combined with React Hooks became the industry standard. Functional components are cleaner, require less boilerplate code, prevent issues with the dynamic binding of the 'this' keyword, and allow for better minification and tree-shaking during build steps.",
+    syntax: "function MyComponent(props) { return <div>{props.name}</div>; }",
+    code: `import React, { Component } from 'react';
 
-  return (
-    <div className="border-2 border-black p-4 font-mono bg-yellow-50 my-2">
-      <h2 className="font-bold text-lg uppercase text-black">{user.name}</h2>
-      <p className="text-xs text-gray-600 mb-2">{user.role}</p>
-      <div className="inline-block bg-black text-[#58a6ff] text-xs px-2 py-1 font-bold">
-        STATUS: {getStatus()}
+// Classical ES6 Class representation
+class OlderClassComponent extends Component<{ message: string }, { counter: number }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { counter: 0 };
+  }
+
+  render() {
+    return (
+      <div className="p-3 border-2 border-black bg-stone-50 text-xs mb-4">
+        <h4 className="font-black uppercase text-[10px] text-neutral-500 mb-1">Legacy Class Model</h4>
+        <p className="font-bold mb-2">{this.props.message}: {this.state.counter}</p>
+        <button 
+          onClick={() => this.setState({ counter: this.state.counter + 1 })}
+          className="bg-yellow-300 px-2 py-0.5 border border-black font-black uppercase text-[9px]"
+        >
+          Class Increment
+        </button>
       </div>
-    </div>
-  );
-}`,
-    outputExplanation: "Extracts values from the user metadata and outputs a responsive banner badge showing Sarah's system status dynamically.",
-    practiceTask: "Create a variable named 'date' set to the current year and embed it at the footer of the DashboardCard.",
-    commonMistakes: "Do not use 'class' for HTML classes. Since JSX compiles to JavaScript, 'class' is a preserved JS keyword - you must always use 'className' instead.",
-    interviewQuestion: "Why can't you write standard JS if/else statements directly inside a JSX return block?",
-    miniQuiz: {
-      question: "Which of the following expression embeddings is invalid inside JSX curly braces?",
-      options: [
-        "{Math.max(10, 20)}",
-        "{if (true) { return 'yes' }}",
-        "{isLogged ? 'Welcome' : 'Sign In'}",
-        "{['React', 'Vite'].map(x => <li>{x}</li>)}"
-      ],
-      answerIndex: 1,
-      explanation: "Curly braces in JSX accept statement expressions (expressions that evaluate to a value). An if/else statement is a control flow statement, which does not return a value directly. Use ternary operations or logical short-circuits instead."
-    }
-  },
-  {
-    id: "components",
-    title: "React Components",
-    level: "Beginner",
-    description: "Master nesting components, separating layout files, and structuring composition patterns.",
-    estimate: "12 mins",
-    explanation: "Components are independent, reusable bits of user interface. They are self-contained logical units. Rather than building massive pages, you compose interfaces out of nested modules (headers, navigation cards, feedback blocks).",
-    syntax: "function Child() {}\nfunction Parent() { return <Child />; }",
-    code: `// Sub-component
-function FeatureBadge({ title }: { title: string }) {
-  return <span className="border border-black bg-black text-white px-2 py-0.5 text-xs mr-2 uppercase">{title}</span>;
+    );
+  }
 }
 
-// Parent component
-export default function ProjectFooter() {
+// Modern Functional representation
+function ModernFunctionalComponent({ message }: { message: string }) {
+  const [counter, setCounter] = React.useState(0);
+
   return (
-    <div className="p-4 border-t-2 border-black bg-neutral-100 flex items-center justify-between">
-      <span className="font-mono text-xs">BUILD STACK:</span>
-      <div className="flex">
-        <FeatureBadge title="Vite" />
-        <FeatureBadge title="Tailwind" />
-        <FeatureBadge title="React 19" />
-      </div>
+    <div className="p-3 border-2 border-black bg-[#00FF00]/5 text-xs">
+      <h4 className="font-black uppercase text-[10px] text-green-700 mb-1">Modern Functional Model</h4>
+      <p className="font-bold mb-2">{message}: {counter}</p>
+      <button 
+        onClick={() => setCounter(prev => prev + 1)}
+        className="bg-[#00FF00] px-2 py-0.5 border border-black font-black uppercase text-[9px]"
+      >
+        Functional Increment
+      </button>
+    </div>
+  );
+}
+
+export default function CombinedDemo() {
+  return (
+    <div className="p-6 border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+      <h3 className="font-black uppercase text-sm mb-3">Architectural Comparison</h3>
+      <OlderClassComponent message="Class Clicks" />
+      <ModernFunctionalComponent message="Hooks Clicks" />
     </div>
   );
 }`,
-    outputExplanation: "Produces a neat inline horizontal status tray with custom labels.",
-    practiceTask: "Add a custom description prop or element to the FeatureBadge and display it as lowercase under the badge.",
-    commonMistakes: "Avoid nesting the function definition of one component inside another. This causes the internal component to be destroyed and recreated on every single render, losing focus and performance.",
-    interviewQuestion: "What is the difference between functional components and class components in React?",
+    outputExplanation: "Demonstrates both architectural models side-by-side. Both execute identical tasks, but the functional component uses simpler declarative Hooks instead of constructor patterns.",
+    practiceTask: "Refactor the 'OlderClassComponent' to fully operate inside a modern functional component without utilizing stateful class constructors.",
+    commonMistakes: "Attempting to use React Hooks (like useState or useEffect) inside Class components. Hooks are strictly exclusive to function frameworks.",
+    interviewQuestion: "What are the primary advantages of functional components over ES6 class components in React?",
     miniQuiz: {
-      question: "What occurs if you define a component function inside another component's render body?",
+      question: "Which keyword creates binding issues related to context scope that are eliminated in functional components?",
       options: [
-        "It triggers a compilation error automatically",
-        "It behaves perfectly and improves loading performance",
-        "React re-creates information from scratch on each rendering trigger, wiping any internal state and element focus",
-        "It prevents Tailwind classes from applying styling rules"
+        "const",
+        "super",
+        "this",
+        "export"
       ],
       answerIndex: 2,
-      explanation: "Nesting component definitions causes the inner function blueprint to get redefined on each parent render cycle, forcing React to fully unmount and remount that subtree."
+      explanation: "Class components rely heavily on 'this' to reference props, state, and custom event handlers, which often requires explicit binding inside constructor hooks."
     }
   },
   {
-    id: "props",
-    title: "Understanding Props",
+    id: "props-reusability",
+    title: "3. Component Props & Reusability",
     level: "Beginner",
-    description: "Learn how to orchestrate single-direction data flow with props and props callbacks.",
-    estimate: "15 mins",
-    explanation: "Props (short for properties) represent read-only inputs passed into components. React employs a strict one-way data flow: props must never be modified by the receiving child component. This makes components predictable and easy to debug.",
-    syntax: "interface Props { value: string; }\nfunction Custom({ value }: Props)",
-    code: `type ButtonProps = {
+    estimate: "12 mins",
+    description: "Learn how to feed custom parameter states down into your component hierarchy using immutable attributes (Props) to construct dynamic UI units.",
+    explanation: "Every component can receive configurational attributes from its parent called 'Props' (short for properties). Props are strictly read-only (immutable). A child component must never modify its received root props. Dynamic structures utilize parent callback functions passed as prop values, enabling underlying kids to notify upstream nodes about events.",
+    syntax: "<Card title=\"Product Name\" price={99} />",
+    code: `import React from 'react';
+
+// Dynamic Reusable Element
+interface BadgeProps {
   label: string;
-  variant: "primary" | "secondary";
-  onClick: () => void;
-};
+  type: 'danger' | 'warning' | 'success';
+  onAction?: () => void;
+}
 
-export default function TechButton({ label, variant, onClick }: ButtonProps) {
-  const isPrimary = variant === "primary";
+function StatusBadge({ label, type, onAction }: BadgeProps) {
+  const styles = {
+    danger: "bg-red-500 text-white border-red-700",
+    warning: "bg-yellow-300 text-black border-yellow-500",
+    success: "bg-emerald-400 text-black border-emerald-600"
+  };
+
   return (
-    <button
-      onClick={onClick}
-      className={\`px-4 py-2 font-mono text-sm font-bold uppercase transition-all duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none \${
-        isPrimary 
-          ? 'bg-black text-white hover:bg-neutral-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' 
-          : 'bg-white text-black border-2 border-black hover:bg-neutral-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-      }\`}
-    >
-      {label}
-    </button>
+    <div className={\`p-3 border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)] flex justify-between items-center bg-white \`}>
+      <span className="text-[11px] font-mono font-bold tracking-tight">{label}</span>
+      <div className="flex gap-2">
+        <span className={\`text-[9px] font-black uppercase px-2 py-0.5 border \${styles[type]}\`}>
+          {type}
+        </span>
+        {onAction && (
+          <button 
+            type="button"
+            onClick={onAction}
+            className="text-[9px] font-black border border-black bg-[#00FF00] px-1 active:translate-y-px transition-all"
+          >
+            PING
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ReusableGrid() {
+  const pinger = (badgeName: string) => {
+    alert(\`Ping fired from \${badgeName}!\`);
+  };
+
+  return (
+    <div className="p-6 border-4 border-black bg-neutral-100 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+      <h3 className="font-black uppercase text-sm mb-3">Modular Badge Core</h3>
+      <div className="space-y-2">
+        <StatusBadge label="Production Server Ingress" type="success" onAction={() => pinger("Production Server")} />
+        <StatusBadge label="Firebase Firestore Auth Port" type="warning" onAction={() => pinger("Firestore Auth")} />
+        <StatusBadge label="Telemetry Buffer Limit Breach" type="danger" />
+      </div>
+    </div>
   );
 }`,
-    outputExplanation: "Builds a reactive button with instant state callback hookup. Triggers translation transformations strictly on click actions.",
-    practiceTask: "Implement an additional variant parameter called 'danger' that outputs a bright red background button style with white text.",
-    commonMistakes: "Remember that props are read-only! Mutating standard props lines directly (e.g., props.name = 'John') triggers severe rendering state sync bugs. Treat props as completely immutable.",
-    interviewQuestion: "What does 'immutable props' mean and how does it safeguard code integrity?",
+    outputExplanation: "Demonstrates a reusable block customized with static prop properties, alongside interactive callback triggers connecting component trees.",
+    practiceTask: "Implement an additional prop named 'subText' and display it styled as a smaller gray label directly beneath the main badge label.",
+    commonMistakes: "Directly trying to mutate prop variables inside the child component (e.g., props.label = 'new label'). This triggers rendering state errors.",
+    interviewQuestion: "What is the difference between props and state in React?",
     miniQuiz: {
-      question: "Can a child component update its received props directly?",
+      question: "Which of the following describes prop flow patterns in React?",
       options: [
-        "Yes, by using standard assignments",
-        "No, props are read-only and immutable. Updates must be requested by triggering parent callback functions",
-        "Only if the props contain numbers instead of objects",
-        "Yes, but only inside a useEffect block"
+        "Bidirectional - Parents and children can instantly redefine shared states alike",
+        "Unidirectional - From parent components down into child elements, as immutable records",
+        "Asynchronous - Driven specifically by event sockets",
+        "Dynamic - Stored solely inside local browser cookies"
       ],
       answerIndex: 1,
-      explanation: "Props represent read-only properties. If components need to change details, standard state hook methods must be lifted to the parent and triggered via passed down function callbacks."
+      explanation: "React relies on a clean, unidirectional data flow. Data passes downwards as props, and event updates pass upwards as callback actions."
     }
   },
   {
-    id: "state",
-    title: "Component State",
+    id: "react-state-cycles",
+    title: "4. React State & Re-render Cycles",
     level: "Beginner",
-    description: "Manage component state with useState, and handle events with clean interactive loops.",
-    estimate: "15 mins",
-    explanation: "State is dynamic, component-specific storage that triggers UI re-renders on update. Unlike read-only props, state is fully local and mutable using the set-state callback setter. React tracks these hooks and immediately performs re-computations upon update triggers.",
+    estimate: "10 mins",
+    description: "Learn how React tracks state updates internally and how component mounting, rendering, and unmounting cycles function.",
+    explanation: "In React, state representation (`useState`) triggers a visual translation when updated. When state changes, the component execution flow is standardly run again to produce updated Virtual DOM trees. Understanding these render cycles prevents unnecessary calculations and infinite state update-loops.",
     syntax: "const [state, setState] = useState(initialValue);",
-    code: `import { useState } from 'react';
+    code: `import React, { useState } from 'react';
 
-export default function Counter() {
-  const [count, setCount] = useState<number>(0);
+export default function RenderCycleVisualizer() {
+  const [renderCount, setRenderCount] = useState(1);
+  const [typedText, setTypedText] = useState("");
+
+  const handleIncrement = () => {
+    setRenderCount(prev => prev + 1);
+  };
 
   return (
-    <div className="p-6 border-2 border-black bg-white max-w-sm">
-      <h3 className="font-mono text-xs text-gray-500 mb-2 uppercase">VISITOR REGISTER</h3>
-      <div className="flex items-baseline space-x-2">
-        <span className="font-sans font-black text-5xl text-black">{count}</span>
-        <span className="font-mono text-xs text-green-600">ACTIVE</span>
-      </div>
-      <div className="flex gap-2 mt-4">
+    <div className="p-6 border-4 border-black bg-white shadow-[4px_4px_0px_rgba(0,0,0,1)] font-mono">
+      <h3 className="text-sm font-black uppercase mb-3">State Cycle Tracker</h3>
+      <div className="space-y-4 text-xs">
+        <div className="p-3 bg-neutral-100 border-2 border-black flex justify-between items-center">
+          <span className="font-bold">Total Renders:</span>
+          <span className="bg-yellow-300 font-black px-2 py-0.5 border border-black">{renderCount}</span>
+        </div>
+        <div>
+          <label className="block text-[10px] font-black mb-1 uppercase text-neutral-500">Live Typing State:</label>
+          <input 
+            type="text" 
+            value={typedText} 
+            onChange={(e) => setTypedText(e.target.value)}
+            className="w-full border-2 border-black p-2 font-bold focus:bg-yellow-50/50" 
+            placeholder="Type anything to trigger render cycle updates..."
+          />
+        </div>
         <button 
-          onClick={() => setCount(prev => prev + 1)}
-          className="bg-black hover:bg-neutral-800 text-white px-3 py-1 text-xs font-mono uppercase font-bold"
+          onClick={handleIncrement}
+          className="w-full bg-[#00FF00] border-2 border-black text-black font-black uppercase text-[10px] py-1.5 active:translate-y-0.5 transition-all cursor-pointer"
         >
-          ADD VISITOR
-        </button>
-        <button 
-          onClick={() => setCount(0)}
-          className="border border-black text-black px-3 py-1 text-xs font-mono uppercase hover:bg-neutral-50"
-        >
-          RESET
+          Increment Stats
         </button>
       </div>
     </div>
   );
 }`,
-    outputExplanation: "Provides an interactive live counter utilizing react's native virtual updates. State maintains counts inside client variables seamlessly.",
-    practiceTask: "Add a condition that prevents the counter from dropping below a zero value when custom decrement triggers get executed.",
-    commonMistakes: "Never update state variables directly (e.g. use count = count + 1 instead of setCount). Direct mutation of state objects misses the render loop entirely and keeps visual cards stale.",
-    interviewQuestion: "Why is state update in React batch-processed asynchronously instead of in a synchronous execution thread?",
+    outputExplanation: "Displays a fully functioning state listener. Changing input values or pressing buttons forces state transitions, re-executing functions to refresh DOM values dynamically.",
+    practiceTask: "Implement an input listener that triggers a conditional check when text length exceeds 10 characters.",
+    commonMistakes: "Updating state directly inside the component body, which executes on every render, sparking an infinite loop.",
+    interviewQuestion: "Why are React state updates asynchronous, and how do you access the latest state immediately?",
     miniQuiz: {
-      question: "What is correct regarding state update operations in React?",
+      question: "Which hook should be used to synchronize state with side effects or external events?",
       options: [
-        "React state changes are reflected in real-time instantly inside the next immediate JS execution statement",
-        "State changes must be triggered by assigning variables directly: state = newValue",
-        "State setters are asynchronous and batched to prevent unnecessary layout computations across sequential updates",
-        "Creating multiple state hooks slows down rendering cycles severely"
-      ],
-      answerIndex: 2,
-      explanation: "React bunches up updates in order to perform a single unified render and paint phase, ensuring maximum smooth performance."
-    }
-  },
-  {
-    id: "useeffect",
-    title: "The useEffect Hook",
-    level: "Beginner",
-    description: "Understand side-effects, dependency lists, and component lifecycle events.",
-    estimate: "15 mins",
-    explanation: "Side effects are operations that affect things outside of the pure React render cycle - such as API requests, event listeners, or timer creation. The useEffect hook allows functional components to execute side effects cleanly, with explicit declarations of when those triggers should run.",
-    syntax: "useEffect(() => { /* effect code */ return () => /* cleanup */; }, [dependencies]);",
-    code: `import { useState, useEffect } from 'react';
-
-export default function Clock() {
-  const [time, setTime] = useState<string>(new Date().toLocaleTimeString());
-
-  useEffect(() => {
-    // 1. Establish the side effect timer
-    const intervalId = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
-    }, 1000);
-
-    // 2. Return a cleanup callback to avoid memory leaks!
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []); // Empty array signifies mounting lifecycle trigger once only.
-
-  return (
-    <div className="p-4 border-2 border-black font-mono bg-stone-900 text-green-400 text-center text-sm">
-      STABLE CLIENT CLOCK UTC: {time}
-    </div>
-  );
-}`,
-    outputExplanation: "Spawns a client-side polling clock. The local interval updates every second, automatically cleaning up garbage memory objects when the clock unmounts from the browser viewport.",
-    practiceTask: "Extend the useEffect setup to log a message in the browser developer console exactly one time when the component loads.",
-    commonMistakes: "Omitting the dependency list entirely. If you forget to provide an array, the effect triggers on *every single* state change, causing infinite loops and major memory crashes.",
-    interviewQuestion: "What is the primary function of the cleanup method returned inside a useEffect declaration?",
-    miniQuiz: {
-      question: "What does an empty dependency array [] signify inside a useEffect formulation?",
-      options: [
-        "The effect runs recursively infinitely on a 1ms microtask",
-        "The effect executes once only during the component's mounting stage on screen",
-        "The effect is deactivated entirely and ignored during compilation",
-        "The effect only executes when standard local storage variables trigger changes"
-      ],
-      answerIndex: 1,
-      explanation: "An empty array signals to React that the effect function has zero dependencies on local props or state, meaning it only needs to run once when the element is first initialized."
-    }
-  },
-
-  // INTERMEDIATE LESSONS
-  {
-    id: "custom-hooks",
-    title: "Custom Hooks",
-    level: "Intermediate",
-    description: "Extract clean, modular state logic into generic reusable hook functions.",
-    estimate: "15 mins",
-    explanation: "Custom hooks allow developers to extract component state logic into reusable functions. A custom hook is a standard JavaScript function whose name starts with 'use', which is allowed to call other React hooks internally. This promotes DRY (Don't Repeat Yourself) design.",
-    syntax: "function useGenericHook() { ... return [value, setter]; }",
-    code: `import { useState, useEffect } from 'react';
-
-// Reusable custom hook for window width tracking
-function useWindowSize() {
-  const [size, setSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1200
-  });
-
-  useEffect(() => {
-    const handleResize = () => setSize({ width: window.innerWidth });
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return size;
-}
-
-// In component usage
-export default function ResponsiveBadge() {
-  const { width } = useWindowSize();
-  return (
-    <div className="border border-black p-4 font-mono text-xs bg-[#e1ebd5]">
-      VIEWPORT RESIZE MONITOR: <span className="underline font-bold font-sans">{width}px</span>
-    </div>
-  );
-}`,
-    outputExplanation: "Produces a responsive component display that dynamically tracks the current page width in real time without lagging components.",
-    practiceTask: "Build a custom hook named useToggle that accepts a default boolean state and returns [state, toggleFunction] to manage toggle lists.",
-    commonMistakes: "Remember that custom hook names must always start with 'use' (e.g. useLocalStorage, not trackingState). This signals React's compiler tools to validate standard hook execution safety guidelines.",
-    interviewQuestion: "How do custom hooks maintain isolated state states when called across multiple independent screens?",
-    miniQuiz: {
-      question: "Do multiple components invoking the same custom hook share the exact same state values?",
-      options: [
-        "Yes, custom hooks serve as unified global store singletons automatically",
-        "No, every execution of a custom hook instantiates fresh independent local state elements in that component instance",
-        "Only if the hook is defined inside a global state provider layout",
-        "Yes, but only if they are siblings in the virtual layout hierarchy"
-      ],
-      answerIndex: 1,
-      explanation: "A custom hook is only a reuse of logic. Each call generates its own independent state slots on the host component."
-    }
-  },
-  {
-    id: "context-api",
-    title: "The Context API",
-    level: "Intermediate",
-    description: "Avoid props drilling by providing global state contexts across deep component trees.",
-    estimate: "18 mins",
-    explanation: "Props drilling is the painful task of passing parameters through multiple levels of components that don't need them, just to reach a deep child. React Context provides a direct way to propagate values down the component branch without manual parameters routing.",
-    syntax: "const AppContext = createContext();\n<AppContext.Provider value={store}>",
-    code: `import { createContext, useContext, useState } from 'react';
-
-// Create context object
-const ThemeContext = createContext<{
-  theme: string;
-  toggleTheme: () => void;
-} | undefined>(undefined);
-
-// Provider parent component
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<string>("LIGHT");
-  const toggleTheme = () => setTheme(prev => prev === "LIGHT" ? "DARK" : "LIGHT");
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-// Custom hook to consume context
-export function useAppTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error("useAppTheme must be used within themed layout tags");
-  return context;
-}
-`,
-    outputExplanation: "Sets up a global theme transmitter. Any nested components can consume dynamic 'theme' fields with zero manual props passing required in the intermediary files.",
-    practiceTask: "Add a custom user metadata field directly into the context payload so childrens can greet the verified user by their full name.",
-    commonMistakes: "Overusing global context. Setting massive, highly volatile state trees inside Context API triggers a recompute cascade on all subscribing elements. Keep high-frequency state updates in local state or dedicated external stores.",
-    interviewQuestion: "What is the primary difference in performance between Redux/Zustand and React Context?",
-    miniQuiz: {
-      question: "Which hook should a functional component consume to interact with a declared React Context Provider?",
-      options: [
-        "useContext",
-        "useProviderContext",
-        "useSelector",
+        "useMemo",
+        "useEffect",
+        "useCallback",
         "useRef"
       ],
-      answerIndex: 0,
-      explanation: "The standard 'useContext' hook extracts context state outputs dynamically based on the target Context reference passed in."
+      answerIndex: 1,
+      explanation: "useEffect is specifically intended to declare rendering outcomes triggered by state updates and side effects."
     }
   },
   {
-    id: "api-fetching",
-    title: "Working with APIs",
-    level: "Intermediate",
-    description: "Learn how to query remote services, serialize JSON, handle network faults, and trigger loading indicators.",
-    estimate: "20 mins",
-    explanation: "Web applications need to synchronize local screens with external cloud databases. Typically, this is achieved by executing asynchronous fetch requests inside useEffect blocks, assigning status states (loading, errors, successful data payloads) to manage visual states.",
-    syntax: "fetch(url).then(res => res.json()).then(data => setData(data))",
-    code: `import { useState, useEffect } from 'react';
+    id: "conditional-rendering-lists",
+    title: "5. Conditional Rendering & Lists",
+    level: "Beginner",
+    estimate: "11 mins",
+    description: "Learn how to selectively render HTML branches and map array structures utilizing unique key-attributes safely.",
+    explanation: "Dynamic user interfaces require selective execution patterns. Conditional blocks use ternary operators or inline logical evaluation. Multi-item render cycles map lists onto elements. React requires each list item to feature a unique 'key' identifier so its reconciliation engine can track updates, reorganizations, and deletions without rebuilt render grids.",
+    syntax: "items.map((item) => <li key={item.id}>{item.name}</li>)",
+    code: `import React, { useState } from 'react';
 
-interface Post {
-  id: number;
-  title: string;
+interface TaskItem {
+  id: string;
+  name: string;
+  severity: 'high' | 'normal';
 }
 
-export default function PostLoader() {
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export default function TaskMapViewer() {
+  const [tasks, setTasks] = useState<TaskItem[]>([
+    { id: "1", name: "Set up Firestore security layers", severity: "high" },
+    { id: "2", name: "Translate dynamic index schemas", severity: "normal" },
+    { id: "3", name: "Verify Cloud OAuth parameters", severity: "high" }
+  ]);
+  const [priorityFilter, setPriorityFilter] = useState(false);
 
-  useEffect(() => {
-    let active = true; // Guard track to prevent race conditions
+  const toggleTaskSeverity = (id: string) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, severity: t.severity === 'high' ? 'normal' : 'high' } : t));
+  };
 
-    setLoading(true);
-    fetch('https://jsonplaceholder.typicode.com/posts/1')
-      .then(res => {
-        if (!res.ok) throw new Error("Could not acquire endpoint payload");
-        return res.json();
-      })
-      .then(data => {
-        if (active) {
-          setPost(data);
-          setError(null);
-        }
-      })
-      .catch(err => {
-        if (active) setError(err.message);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => { active = false; };
-  }, []);
-
-  if (loading) return <span className="font-mono text-xs animate-pulse text-gray-500">POLLING CLOUD SERVERS...</span>;
-  if (error) return <span className="font-mono text-xs text-red-600">ERROR: {error}</span>;
+  const filteredTasks = priorityFilter ? tasks.filter(t => t.severity === 'high') : tasks;
 
   return (
-    <div className="border border-black p-4 bg-[#f8f9fa] mt-2">
-      <h4 className="font-mono text-xs text-[#0066cc] uppercase font-bold">SERIALIZED SOURCE #1</h4>
-      <p className="font-sans font-bold text-sm mt-1">{post?.title}</p>
+    <div className="p-6 border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-black text-xs uppercase uppercase">Task Dispatch Panel</h3>
+        <button 
+          onClick={() => setPriorityFilter(!priorityFilter)}
+          className={\`text-[9px] font-black border-2 border-black px-2 py-1 uppercase \${
+            priorityFilter ? 'bg-red-500 text-white' : 'bg-neutral-200 text-black'
+          }\`}
+        >
+          {priorityFilter ? "🔥 Showing Crucial Only" : "Showing All Tasks"}
+        </button>
+      </div>
+
+      <ul className="space-y-2">
+        {filteredTasks.map((tsk) => (
+          <li 
+            key={tsk.id} 
+            className="flex justify-between items-center p-2.5 bg-neutral-50 border-2 border-black text-xs"
+          >
+            <span className={tsk.severity === 'high' ? "font-black text-black" : "font-semibold text-neutral-600"}>
+              {tsk.name}
+            </span>
+            <button 
+              onClick={() => toggleTaskSeverity(tsk.id)}
+              className={\`text-[9px] font-mono px-2 py-0.5 border border-black font-black uppercase tracking-tight active:translate-y-px transition-all \${
+                tsk.severity === 'high' ? 'bg-red-100/50 text-red-600' : 'bg-[#00FF00]/10 text-emerald-800'
+              }\`}
+            >
+              {tsk.severity === 'high' ? 'High' : 'Normal'}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }`,
-    outputExplanation: "Fires an HTTP GET query to JSONPlaceholder, monitors load indicators, triggers cleanups to avoid memory trace leaks, and safely updates DOM structures.",
-    practiceTask: "Implement an interactive 'Reload Post' click trigger inside the loader layout using custom increment triggers inside the dependency array.",
-    commonMistakes: "Forgetting to implement async race-condition safeguards. If your api call takes too long and the user changes pages, assigning states to unmounted components triggers console warnings and memory leak anomalies.",
-    interviewQuestion: "What is a network race condition inside React's layout triggers, and how does standard local boolean variables solve this issue?",
+    outputExplanation: "Demonstrates filtering and list mappings with unique keys. Updates re-evaluate list layouts in real time while maintaining state across changes.",
+    practiceTask: "Implement an input form field that allows typing a task name and appending it to the list state with a generated ID.",
+    commonMistakes: "Using array indices (e.g. key=index) as unique React keys. Doing so leads to layout errors and state mix-ups if elements are deleted or re-ordered.",
+    interviewQuestion: "Why should you avoid using Math.random() inside functional React key assignment statements?",
     miniQuiz: {
-      question: "Why should you fetch remote API objects inside a useEffect block rather than inside standard functional components boundaries?",
+      question: "Which array function is primarily utilized in React to transform arrays of records into arrays of visual JSX tags?",
       options: [
-        "Variables defined inside standard boundaries cannot undergo text-manipulations",
-        "Executing fetch calls in component bodies directly fires API requests repeatedly on *EVERY SINGLE* layout render frame, choking server bandwidth",
-        "Standard functions are strictly prohibited from parsing JSON structures",
-        "Browsers block outer networks if standard functions execute them"
+        "Array.prototype.forEach",
+        "Array.prototype.filter",
+        "Array.prototype.map",
+        "Array.prototype.reduce"
       ],
-      answerIndex: 1,
-      explanation: "Executing side-effects inside raw component bodies causes them to trigger on every design update cycle, leading to infinite API calls."
+      answerIndex: 2,
+      explanation: "map iterates through each record, returning a corresponding JSX template element to construct clean dynamic lists."
     }
   },
-
-  // ADVANCED LESSONS
   {
-    id: "usereducer",
-    title: "Complex State with useReducer",
-    level: "Advanced",
-    description: "Orchestrate elaborate state workflows using Redux-style Reducer and Action dispatch mechanisms.",
+    id: "forms-controlled-inputs",
+    title: "6. Forms & Controlled Inputs",
+    level: "Intermediate",
+    estimate: "13 mins",
+    description: "Learn to handle form interactions, handle user keystrokes, prevent standard page refreshes, and track input states natively in React state.",
+    explanation: "HTML elements like inputs, drop-downs, and forms maintain personal local states inside the browser. In React, a component functions best when state updates are fully centralized. This approach is called 'Controlled Components'. Every keystroke triggers update listeners which bind inputs directly to useState hooks.",
+    syntax: "const [val, setVal] = useState('');\n<input value={val} onChange={e => setVal(e.target.value)} />",
+    code: `import React, { useState } from 'react';
+
+export default function SecureRegistration() {
+  const [form, setForm] = useState({ name: '', email: '', role: 'Developer' });
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault(); // Stop standard HTML page reload on submit
+    if (form.name.length < 3 || !form.email.includes('@')) {
+      alert("Invalid user specifications! Please update details.");
+      return;
+    }
+    setSuccess(true);
+  };
+
+  return (
+    <div className="p-6 border-4 border-black bg-stone-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">
+      <h3 className="font-black uppercase text-sm mb-3">Enterprise Access Node</h3>
+      
+      {success ? (
+        <div className="bg-[#00FF00]/10 border-2 border-black p-4 text-center">
+          <p className="font-black text-black uppercase mb-1">Access Handshake Configured!</p>
+          <p className="text-[10px] text-stone-600">Name: {form.name} // User: {form.email} // Role: {form.role}</p>
+          <button 
+            type="button"
+            onClick={() => { setForm({ name: '', email: '', role: 'Developer' }); setSuccess(false); }}
+            className="mt-3 bg-black text-white font-black px-2 py-1 uppercase text-[10px] cursor-pointer"
+          >
+            Clear Record
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-[9px] font-black uppercase text-neutral-500 mb-1">Full Name</label>
+            <input 
+              type="text"
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              className="w-full border-2 border-black p-2 font-black text-neutral-800 focus:bg-yellow-50/20"
+              placeholder="Your name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[9px] font-black uppercase text-neutral-500 mb-1">Email Coordinates</label>
+            <input 
+              type="text"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+              className="w-full border-2 border-black p-2 font-black text-neutral-800 focus:bg-yellow-50/20"
+              placeholder="admin@enterprise.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[9px] font-black uppercase text-neutral-500 mb-1">Assigned Framework</label>
+            <select 
+              value={form.role}
+              onChange={e => setForm({ ...form, role: e.target.value })}
+              className="w-full border-2 border-black p-2 font-black bg-white focus:bg-yellow-50/20 cursor-pointer"
+            >
+              <option>Developer</option>
+              <option>Architect</option>
+              <option>Security Auditor</option>
+            </select>
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full bg-[#00FF00] hover:bg-emerald-400 border-2 border-black py-2 text-black font-black uppercase"
+          >
+            Create Sandbox Credential
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}`,
+    outputExplanation: "Demonstrates controlled component bindings. State objects update on change events, and the submit handler processes validation checks before allowing login transactions.",
+    practiceTask: "Implement real-time error logging below each form input field that outputs warnings if inputs are too short.",
+    commonMistakes: "Forgetting to call 'event.preventDefault()' in submit functions, which causes standard browser form triggers to refresh active pages, wiping current React states.",
+    interviewQuestion: "What is the difference between controlled and uncontrolled components inside React forms, and when would you use uncontrolled inputs?",
+    miniQuiz: {
+      question: "Which DOM property links standard HTML element inputs to useState tracking variables?",
+      options: [
+        "defaultValue",
+        "value",
+        "name",
+        "placeholder"
+      ],
+      answerIndex: 1,
+      explanation: "The value prop of an input element binds its displayed content directly to React state values, maintaining centralized control."
+    }
+  },
+  {
+    id: "hooks-useeffect",
+    title: "7. React Lifecycle & useEffect",
+    level: "Intermediate",
     estimate: "15 mins",
-    explanation: "For state structures with tightly coupled fields or complex logic rules, useState can get confusing. useReducer offers a predictable alternative by adopting a consolidated state store model. All updates occur by dispatching structured actions, which pass through a pure 'reducer' function.",
+    description: "Learn to handle side effects, track state changes, execute API queries, and clean up active event listeners correctly.",
+    explanation: "React components must execute cleanly without side effects. Side effects include data queries, timers, or subscribing to sockets. The `useEffect` hook enables synchronization, and takes a dependency array representing the states it monitors. Returning a clean-up function prevents memory leaks when components unmount.",
+    syntax: "useEffect(() => { subscribe(); return () => unsubscribe(); }, [dependency]);",
+    code: `import React, { useState, useEffect } from 'react';
+
+export default function HeartbeatMonitor() {
+  const [pulse, setPulse] = useState(72);
+  const [timerCount, setTimerCount] = useState(0);
+  const [listening, setListening] = useState(false);
+
+  useEffect(() => {
+    if (!listening) return;
+
+    // Start background activity tracking interval
+    const cycleInterval = setInterval(() => {
+      setTimerCount(t => t + 1);
+      setPulse(p => Math.floor(70 + Math.random() * 15));
+    }, 1000);
+
+    // CRITICAL: Cleanup function runs when component unmounts or dependencies update
+    return () => {
+      clearInterval(cycleInterval);
+    };
+  }, [listening]);
+
+  return (
+    <div className="p-6 border-4 border-black bg-stone-900 text-stone-200 font-mono shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-xs">
+      <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-stone-800">
+        <h3 className="text-white font-black uppercase text-[11px] uppercase">Pulse Synchronizer</h3>
+        <span className={\`text-[9px] px-1.5 py-0.5 border \${
+          listening ? 'bg-[#00FF00] text-black border-black animate-pulse' : 'bg-red-500 text-white border-red-700'
+        }\`}>
+          {listening ? "LISTENING" : "QUARANTINED"}
+        </span>
+      </div>
+
+      <div className="space-y-3 mb-4">
+        <div className="flex justify-between bg-stone-950 p-2 border border-stone-800">
+          <span>Active Session Lifespan:</span>
+          <span className="font-bold text-yellow-500">{timerCount} seconds</span>
+        </div>
+        <div className="flex justify-between bg-stone-950 p-2 border border-stone-800">
+          <span>Simulated Core Pulse Rate:</span>
+          <span className="font-bold text-cyan-400">{pulse} BPM</span>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <button 
+          onClick={() => setListening(true)}
+          className="flex-1 bg-neutral-800 hover:bg-neutral-750 border border-stone-700 text-white font-mono uppercase text-[10px] py-1.5 cursor-pointer"
+        >
+          Initialize Listener
+        </button>
+        <button 
+          onClick={() => { setListening(false); setTimerCount(0); }}
+          className="flex-1 bg-red-950/30 text-red-400 border border-red-900 py-1.5 uppercase text-[10px] hover:bg-red-950/50 cursor-pointer"
+        >
+          Deactivate
+        </button>
+      </div>
+    </div>
+  );
+}`,
+    outputExplanation: "Handles interval state synchronization correctly. Deactivating the listener triggers clean-up functions instantly, helping avoid memory leaks.",
+    practiceTask: "Implement an asynchronous API simulation fetch loading indicator using useEffect when mounting the card on layout grids.",
+    commonMistakes: "Omitting dependency arrays entirely, which triggers side effects on every single render and severely slows page loads.",
+    interviewQuestion: "What happens if you return a function from the useEffect hook, and when is it executed?",
+    miniQuiz: {
+      question: "Which dependency array parameter configuration executes a useEffect hook only once when mounting?",
+      options: [
+        "Empty array ([])",
+        "Omitted completely (undefined dependency)",
+        "Array containing props properties ([props])",
+        "Array filled with primitive Boolean variables ([true])"
+      ],
+      answerIndex: 0,
+      explanation: "Passing an empty dependency array tells React that the side effect does not watch any reactive variables, so it runs only once after the initial render."
+    }
+  },
+  {
+    id: "context-api-uplifting",
+    title: "8. React Context API & Global Stores",
+    level: "Intermediate",
+    estimate: "14 mins",
+    description: "Build clean global State Stores to bypass tedious deep components prop-drilling pathways across workspaces.",
+    explanation: "Deeply nested components often require parameters tracked by parents. Passing props through multiple layers of intermediate components is tedious and makes refactoring difficult. The React Context API solves this challenge by creating global state stores. Any child component can subscribe to this store and access state values or functions directly.",
+    syntax: "const MyCtx = createContext();\n<MyCtx.Provider value={store}>\n  <Child />\n</MyCtx.Provider>",
+    code: `import React, { createContext, useContext, useState } from 'react';
+
+// 1. Establish the global context portal
+interface ConfigStore {
+  mode: 'light' | 'stealth';
+  toggleSecurityMode: () => void;
+}
+const ContextStore = createContext<ConfigStore | undefined>(undefined);
+
+// Nested Kid Component (subscriber node)
+function SecurityStatusBanner() {
+  const store = useContext(ContextStore);
+  if (!store) return null;
+
+  return (
+    <div className={\`p-4 border-2 border-black mb-3 text-xs \${
+      store.mode === 'stealth' ? 'bg-zinc-950 text-emerald-400 border-zinc-800' : 'bg-yellow-300 text-black border-black'
+    }\`}>
+      <h4 className="font-black uppercase tracking-tight mb-1 font-mono text-[10px]">
+        Global Context Consumer Banner
+      </h4>
+      <p className="font-bold">Active Protocol: {store.mode.toUpperCase()} WORKSPACE</p>
+    </div>
+  );
+}
+
+// Another nested subscriber component
+function AccessTogglerButton() {
+  const store = useContext(ContextStore);
+  if (!store) return null;
+
+  return (
+    <button 
+      type="button"
+      onClick={store.toggleSecurityMode}
+      className="w-full bg-black text-white px-3 py-2 font-mono font-black text-[10px] uppercase cursor-pointer"
+    >
+      🔑 Toggle Global Security Paradigm
+    </button>
+  );
+}
+
+// Context wrapper node
+export default function ContextHierarchyLauncher() {
+  const [mode, setMode] = useState<'light' | 'stealth'>('light');
+
+  const toggleSecurityMode = () => {
+    setMode(prev => prev === 'light' ? 'stealth' : 'light');
+  };
+
+  return (
+    <ContextStore.Provider value={{ mode, toggleSecurityMode }}>
+      <div className="p-6 border-4 border-black bg-neutral-200 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono">
+        <h3 className="font-black text-sm uppercase text-black mb-3">Context Store Provider</h3>
+        
+        {/* Sub components do not require parameters drilled explicitly */}
+        <div className="space-y-1">
+          <SecurityStatusBanner />
+          <AccessTogglerButton />
+        </div>
+      </div>
+    </ContextStore.Provider>
+  );
+}`,
+    outputExplanation: "Demonstrates deep state sharing using React Context. Provider wrappers propagate state values downwards, allowing deeply nested subscriber elements to access data directly.",
+    practiceTask: "Expand the global state store values to support tracking an active admin username, displaying it neatly within the Status Banner.",
+    commonMistakes: "Using Context API for rapidly changing variables, which can trigger complete re-renders of the entire subscriber tree.",
+    interviewQuestion: "How does the Context API compare to robust, full-featured state engines like Redux?",
+    miniQuiz: {
+      question: "Which React hook is used inside child components to consume value states emitted by Context Providers?",
+      options: [
+        "useReducer",
+        "useCtxState",
+        "useContext",
+        "useProvider"
+      ],
+      answerIndex: 2,
+      explanation: "useContext is the hook that matches a specified Context object to consume data directly from the nearest parent provider."
+    }
+  },
+  {
+    id: "architecting-custom-hooks",
+    title: "9. Architecting Custom Hooks",
+    level: "Intermediate",
+    estimate: "15 mins",
+    description: "Learn how to bundle code, isolate side effects, and write reusable functional Hooks to clean up component code.",
+    explanation: "When multiple components share similar stateful behaviors, duplicating code is inefficient. Custom hooks solve this by extracting stateful logic into reusable functions. These are standard JavaScript functions whose names always start with 'use'. They can call other React hooks internally, creating custom, reusable logic blocks.",
+    syntax: "export function useToggle(init = false) { ... return [val, toggle]; }",
+    code: `import React, { useState, useEffect } from 'react';
+
+// Custom reusable hook: useLocalStorage
+function useSavedPreference<T>(storageKey: string, initialValue: T): [T, (nextVal: T) => void] {
+  const [pref, setPref] = useState<T>(() => {
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      return stored ? JSON.parse(stored) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const updatePreference = (nextVal: T) => {
+    try {
+      setPref(nextVal);
+      window.localStorage.setItem(storageKey, JSON.stringify(nextVal));
+    } catch (err) {
+      console.error("Localstorage write error", err);
+    }
+  };
+
+  return [pref, updatePreference];
+}
+
+export default function CustomHookTester() {
+  const [themeMode, setThemeMode] = useSavedPreference<string>("workspace_theme", "Default Standard");
+  const [inputText, setInputText] = useState("");
+
+  return (
+    <div className="p-6 border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono text-xs">
+      <h3 className="font-black uppercase text-sm mb-3">Custom Hook Testing Sandbox</h3>
+      
+      <div className="bg-yellow-300 p-3 border-2 border-black mb-4 font-bold text-stone-900">
+        Saved Theme State: {themeMode}
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="block text-[9px] font-black uppercase text-neutral-500 mb-1">Update Persistent Preference:</label>
+          <input 
+            type="text" 
+            value={inputText}
+            onChange={e => setInputText(e.target.value)}
+            className="w-full border-2 border-black p-2 font-black "
+            placeholder="Type theme, e.g., Cyberpunk Dark"
+          />
+        </div>
+
+        <button 
+          onClick={() => {
+            if (inputText.trim()) {
+              setThemeMode(inputText);
+              setInputText("");
+            }
+          }}
+          className="w-full bg-[#00FF00] hover:bg-emerald-400 font-black border-2 border-black py-2 uppercase cursor-pointer"
+        >
+          💾 Apply and Save Configuration
+        </button>
+      </div>
+    </div>
+  );
+}`,
+    outputExplanation: "Demonstrates business logic extraction using a custom useLocalStorage hook. Changing preferences updates state and syncs with storage in a single, reusable function call.",
+    practiceTask: "Create a custom 'useOnlineOfflineStatus' hook that listens to browser connectivity events to display a real-time connection status badge.",
+    commonMistakes: "Not starting custom hook filenames and function names with the mandatory prefix string 'use', which disables linting rules designed for hooks.",
+    interviewQuestion: "What are the rules of React Hooks, and why can they only be called at the top-level of React functions?",
+    miniQuiz: {
+      question: "Which of the following describes a key benefit of custom React hooks?",
+      options: [
+        "They allow functional components to bypass the limitations of the Virtual DOM",
+        "They enable reusing stateful, logical hooks behavior without duplicating code configurations",
+        "They compile JavaScript components directly into native binary systems",
+        "They allow components to share a single, shared state reference with child nodes"
+      ],
+      answerIndex: 1,
+      explanation: "Custom hooks let you extract stateful logic. This separates raw business logic from visual interface templates to improve code quality."
+    }
+  },
+  {
+    id: "usereducer-state-machine",
+    title: "10. The useReducer State Machine",
+    level: "Advanced",
+    estimate: "18 mins",
+    description: "Learn how to manage complex, multi-branch component states predictably using dispatch actions and central reducers.",
+    explanation: "For complex systems with multiple, dependent state transitions, scattered `useState` hooks are difficult to manage. The `useReducer` hook solves this by centralizing state updates into a single function. This 'reducer' function processes actions and returns updated state objects, ensuring reliable and easy-to-test state transitions.",
     syntax: "const [state, dispatch] = useReducer(reducer, initialState);",
-    code: `import { useReducer } from 'react';
+    code: `import React, { useReducer } from 'react';
 
-type State = { count: number; items: string[] };
+// Declarative Interface representing our VM state
+interface SystemConsoleState {
+  memoryLimit: number;
+  warningsDetected: boolean;
+  activeProcesses: number;
+  logFeed: string[];
+}
+
 type Action = 
-  | { type: "add"; payload: string } 
-  | { type: "remove_last" }
-  | { type: "reset" };
+  | { type: 'SPAWN_PROCESS' }
+  | { type: 'TERMINATE_PROCESS' }
+  | { type: 'FORCE_COLD_RESTART' };
 
-function reducer(state: State, action: Action): State {
+const INITIAL_CONSOLE_STATE: SystemConsoleState = {
+  memoryLimit: 128,
+  warningsDetected: false,
+  activeProcesses: 0,
+  logFeed: ["System initiated. Readiness logs safe."]
+};
+
+function consoleReducer(state: SystemConsoleState, action: Action): SystemConsoleState {
+  const timestamp = new Date().toLocaleTimeString();
   switch (action.type) {
-    case "add":
-      return { count: state.count + 1, items: [...state.items, action.payload] };
-    case "remove_last":
-      return { count: Math.max(0, state.count - 1), items: state.items.slice(0, -1) };
-    case "reset":
-      return { count: 0, items: [] };
+    case 'SPAWN_PROCESS': {
+      const nextCount = state.activeProcesses + 1;
+      const memOverflow = nextCount * 64 > state.memoryLimit;
+      return {
+        ...state,
+        activeProcesses: nextCount,
+        warningsDetected: memOverflow,
+        logFeed: [\`[\${timestamp}] Spawned PID \${nextCount * 102} (Active Processes: \${nextCount})\`, ...state.logFeed]
+      };
+    }
+    case 'TERMINATE_PROCESS': {
+      const nextCount = Math.max(0, state.activeProcesses - 1);
+      const memOverflow = nextCount * 64 > state.memoryLimit;
+      return {
+        ...state,
+        activeProcesses: nextCount,
+        warningsDetected: memOverflow,
+        logFeed: [\`[\${timestamp}] Halted PID \${(nextCount + 1) * 102} safely.\`, ...state.logFeed]
+      };
+    }
+    case 'FORCE_COLD_RESTART':
+      return {
+        ...INITIAL_CONSOLE_STATE,
+        logFeed: [\`[\${timestamp}] Emergency Core Reset triggered.\`]
+      };
     default:
       return state;
   }
 }
 
-export default function ReducerDemo() {
-  const [state, dispatch] = useReducer(reducer, { count: 0, items: [] });
+export default function ReducerVMConsole() {
+  const [state, dispatch] = useReducer(consoleReducer, INITIAL_CONSOLE_STATE);
 
   return (
-    <div className="border border-black p-4 bg-white font-mono text-xs">
-      <h4 className="font-bold border-b border-black pb-2 mb-2 uppercase">REDUCER TASK LOGS</h4>
-      <p className="mb-2">COMPLETED ITEMS count: {state.count}</p>
-      <ul className="list-disc pl-4 space-y-1 my-2">
-        {state.items.map((it, idx) => <li key={idx}>{it}</li>)}
-      </ul>
-      <div className="flex gap-2 mt-4 flex-wrap">
-        <button onClick={() => dispatch({ type: "add", payload: "Task #" + (state.count + 1) })} className="bg-black text-white px-2 py-1 font-bold">ADD TASK</button>
-        <button onClick={() => dispatch({ type: "remove_last" })} className="border border-black px-2 py-1">REMOVE PREV</button>
-        <button onClick={() => dispatch({ type: "reset" })} className="text-red-500 border border-red-500 px-2 py-1">RESET</button>
+    <div className="p-6 border-4 border-black bg-stone-950 text-stone-200 font-mono shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-xs">
+      <div className="flex justify-between items-center mb-4 pb-2 border-b border-stone-800">
+        <h3 className="text-white font-black uppercase text-[11px]">System VM Node</h3>
+        <span className={\`text-[9px] px-2 py-0.5 border font-black \${
+          state.warningsDetected ? 'bg-red-500 text-white animate-pulse border-red-750' : 'bg-[#00FF00] text-black border-black'
+        }\`}>
+          {state.warningsDetected ? "⚠️ OVERLOAD DETECTED" : "GREEN - READY"}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-stone-900 p-2.5 border border-stone-800">
+          <p className="text-[10px] text-stone-400 uppercase">Process Queue</p>
+          <p className="font-black text-white text-base mt-0.5">{state.activeProcesses}</p>
+        </div>
+        <div className="bg-stone-900 p-2.5 border border-stone-800">
+          <p className="text-[10px] text-stone-400 uppercase">Memory Allocation</p>
+          <p className="font-black text-white text-base mt-0.5">{state.activeProcesses * 64} / {state.memoryLimit}MB</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <button 
+          onClick={() => dispatch({ type: 'SPAWN_PROCESS' })}
+          className="flex-1 bg-neutral-800 hover:bg-neutral-750 font-black border border-stone-700 py-1.5 uppercase text-[9px] cursor-pointer"
+        >
+          + Spawn PID
+        </button>
+        <button 
+          onClick={() => dispatch({ type: 'TERMINATE_PROCESS' })}
+          className="flex-1 bg-neutral-850 hover:bg-neutral-800 font-black border border-stone-750 py-1.5 uppercase text-[9px] cursor-pointer"
+        >
+          - Halt PID
+        </button>
+        <button 
+          onClick={() => dispatch({ type: 'FORCE_COLD_RESTART' })}
+          className="bg-red-950/40 text-red-400 border border-red-900 py-1.5 px-3 uppercase text-[9px] hover:bg-red-950/60 cursor-pointer"
+        >
+          CORE RESET
+        </button>
+      </div>
+
+      <div className="p-3 bg-stone-900 border border-stone-800 rounded-sm">
+        <h4 className="text-white text-[9px] font-black uppercase mb-2">VM Operation Logs:</h4>
+        <pre className="text-[9px] max-h-24 overflow-y-auto leading-relaxed text-emerald-400">
+          {state.logFeed.join('\\n')}
+        </pre>
       </div>
     </div>
   );
 }`,
-    outputExplanation: "Demonstrates an clean dispatch loop. Modifying lists is fully driven by structured action types.",
-    practiceTask: "Implement an action type named 'edit_first_item' which updates the value of indexes directly using custom parameters.",
-    commonMistakes: "Mutating the state object directly inside the reducer. Always return a brand new state object (e.g. return new arrays using spread operator [...prev]) to allow React to check differences and update elements.",
-    interviewQuestion: "What are the core parameters of a standard Reducer function and what makes them functional pure?",
+    outputExplanation: "Demonstrates useReducer executing centralized actions dynamically. Sending dispatched operations keeps state values robust and structured.",
+    practiceTask: "Incorporate a customizable memory configuration action that allows changing the maximum memory limit payload dynamically.",
+    commonMistakes: "Directly mutating the reducer's current state object from within custom cases. Reducers must remain pure functions and always return brand new, fully cloned state objects.",
+    interviewQuestion: "When should you choose useReducer over multiple useState hooks in a React component?",
     miniQuiz: {
-      question: "What is the primary role of a dispatch function returned by useReducer?",
+      question: "Which of the following describes a key characteristics of a Reducer function in React?",
       options: [
-        "It downloads external state packages over network protocols",
-        "It sends structured actions to the reducer, designating how the state should transition",
-        "It parses HTML structures into JSON payloads",
-        "It speeds up state allocations using memory pointers"
+        "It interacts directly with relational databases asynchronously",
+        "It is a pure function that takes previous state and action payload to calculate next state securely",
+        "It replaces component stylesheets with dynamic vector graphics",
+        "It compiles standard HTML components into inline context bundles"
       ],
       answerIndex: 1,
-      explanation: "Calling dispatch sends an action payload into the reducer. The reducer recalculates the state and informs React to paint the adjustments."
+      explanation: "A reducer must remain a pure function. It should not make API requests or cause side effects; it simply derives next states based on received action objects."
     }
   },
   {
-    id: "zustand",
-    title: "Global State with Zustand",
+    id: "performance-memoization",
+    title: "11. Performance & Memoization Hooks",
     level: "Advanced",
-    description: "Deploy ultra-lightweight global state stores without the verbose boilerplate of Redux.",
-    estimate: "18 mins",
-    explanation: "Zustand is a modern, fast, and simple global state management library. It uses hook-based stores to bundle state slices and methods without Provider nesting. It runs outside of the standard React render phase and selectively triggers updates ONLY on components directly listening to changed variables.",
-    syntax: "import { create } from 'zustand';\nconst useStore = create((set) => ({ ... }));",
-    code: `// Simulating Zustand store structure inside React
-import { useState } from 'react';
+    estimate: "16 mins",
+    description: "Learn to trace, measure, and optimize slow components using useMemo, useCallback, and dynamic component memo flags.",
+    explanation: "Re-rendering components recalculates local variables and updates child elements unnecessarily. The `useMemo` hook optimizes performance by caching the results of expensive calculations, while `useCallback` caches function references across renders to prevent children from reloading unnecessarily.",
+    syntax: "const cachedValue = useMemo(() => expensiveFn(a), [a]);\nconst cachedCallback = useCallback(() => fn(), []);",
+    code: `import React, { useState, useMemo, useCallback } from 'react';
 
-// Real Zustand definition looks like:
-// import { create } from 'zustand';
-// export const useDocProgressStore = create((set) => ({
-//   completed: [],
-//   markCompleted: (id) => set((s) => ({ completed: [...s.completed, id] }))
-// }));
-
-// Simulating custom Zustand logic layout
-export function useStorePreview() {
-  const [completed, setCompleted] = useState<string[]>([]);
-  const toggle = (id: string) => {
-    setCompleted(prev => 
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-  return { completed, toggle };
-}`,
-    outputExplanation: "Creates a lightweight custom global tracker simulation layer matching Zustand's state patterns.",
-    practiceTask: "Add a method to clear the entire completed list with a single click call.",
-    commonMistakes: "Selecting entire store objects instead of fine-grained selectors (e.g., const {x} = useStore() instead of const x = useStore(state => state.x)). Failing to use selectors causes components to re-render in response to edits inside any unrelated properties of the global store.",
-    interviewQuestion: "How does Zustand achieve better performance metrics compared to classic React Context API?",
-    miniQuiz: {
-      question: "Which pattern does Zustand rely upon to pass state down the component hierarchies?",
-      options: [
-        "It nests the entire DOM inside high-weight Provider trees",
-        "It uses lightweight custom hook selectors that components can import anywhere, completely bypassing Providers",
-        "It writes data to static text files inside public directories",
-        "It compiles JSX layers manually during builds"
-      ],
-      answerIndex: 1,
-      explanation: "Zustand operates completely outside of Providers. It exposes standard react hooks that interface directly with its internal store state."
-    }
-  },
-  {
-    id: "performance-optimization",
-    title: "Performance (useMemo & useCallback)",
-    level: "Advanced",
-    description: "Acquire full command of render frames using memoization, function locks, and computation cache stores.",
-    estimate: "20 mins",
-    explanation: "Every time a React component state changes, it re-executes code line-by-line. If that component runs high-weight mathematical algorithms or re-creates callback functions linked to memoized sub-elements, it triggers major lag points. useMemo caches expensive values, while useCallback preserves exact reference pointers to callbacks.",
-    syntax: "const cachedValue = useMemo(() => computeValue(a), [a]);\nconst memoCallback = useCallback(() => print(b), [b]);",
-    code: `import { useState, useMemo, useCallback } from 'react';
+// Heavily memoized child component
+const ComplexResultViewer = React.memo(({ value }: { value: number }) => {
+  return (
+    <div className="p-3 bg-[#00FF00]/5 border-2 border-[#00FF00]/30 text-xs text-center font-mono font-bold mt-2">
+      ⚡ Specialized Result (Updates only on number change): <span className="bg-[#00FF00] text-black px-1 border border-black">{value}</span>
+    </div>
+  );
+});
 
 export default function PerformanceDashboard() {
-  const [search, setSearch] = useState("");
-  const [items, setItems] = useState<string[]>(["useEffect Guide", "Zustand Store", "React Reconciliation", "Custom Hooks API"]);
+  const [weight, setWeight] = useState(25);
+  const [dummyCount, setDummyCount] = useState(0);
 
-  // 1. Memoize filtered computation - updates only when search or item dependencies adapt
-  const filteredList = useMemo(() => {
-    console.log("Heavy list filtering operation executed...");
-    return items.filter(item => item.toLowerCase().includes(search.toLowerCase()));
-  }, [items, search]);
-
-  // 2. Lock component callback reference pointer 
-  const triggerExport = useCallback(() => {
-    console.log("Triggered callbacks data payload export:", filteredList);
-  }, [filteredList]);
+  // Expensive calculation cached using useMemo
+  const calculatedSquare = useMemo(() => {
+    let loop = 0;
+    while (loop < 500000) loop++; // Mock heavy calculation loop
+    return weight * weight;
+  }, [weight]);
 
   return (
-    <div className="border border-black p-4 bg-[#fcfcfc] font-mono text-xs">
-      <input 
-        type="text" 
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        placeholder="Filter list records..."
-        className="border border-black p-2 w-full text-xs font-sans placeholder-gray-400 focus:outline-none mb-3"
-      />
-      <div className="space-y-1 mb-3">
-        {filteredList.map((item, id) => <div key={id} className="p-1 border border-neutral-200">{item}</div>)}
+    <div className="p-6 border-4 border-black bg-stone-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono text-xs text-stone-900">
+      <h3 className="font-black text-sm uppercase text-black mb-3">Memo Core Testing</h3>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-[10px] font-black uppercase text-neutral-500 mb-1">
+            Simulate Processing Weight: {weight} (Triggers calculations)
+          </label>
+          <input 
+            type="range" 
+            min="10" 
+            max="100" 
+            value={weight}
+            onChange={e => setWeight(Number(e.target.value))}
+            className="w-full cursor-pointer bg-neutral-200 border-2 border-black"
+          />
+        </div>
+
+        <div className="p-3 bg-white border-2 border-black space-y-1.5">
+          <p className="font-bold">Heavy Computed Yield: {calculatedSquare}</p>
+        </div>
+
+        <div className="pt-2 border-t border-neutral-300">
+          <label className="block text-[9px] font-black uppercase text-neutral-500 mb-1">
+            Toggle unrelated states should trigger fast visual re-renders:
+          </label>
+          <button 
+            onClick={() => setDummyCount(d => d + 1)}
+            className="w-full bg-yellow-300 hover:bg-yellow-400 border-2 border-black py-2 uppercase font-black cursor-pointer"
+          >
+            🔄 Trigger Dummy Render [renders: {dummyCount}]
+          </button>
+        </div>
+
+        <ComplexResultViewer value={calculatedSquare} />
       </div>
-      <button onClick={triggerExport} className="bg-black hover:bg-neutral-800 text-white px-2 py-1 font-bold">EXPORT DATA</button>
     </div>
   );
 }`,
-    outputExplanation: "Produces a search system with computation protection guards. Calculations remain cached unless parameters are adjusted.",
-    practiceTask: "Implement an button to append elements to the original list and verify that the memo gets correctly recalculated.",
-    commonMistakes: "Using useMemo or useCallback for simple lightweight operations (like standard string joins). Optimization hooks add internal execution tracking overhead, meaning utilizing them on fast, cheap actions actually slows down start execution speeds.",
-    interviewQuestion: "What is reference security/equality in javascript, and how does it relate to React.memo wrapper components?",
+    outputExplanation: "Demonstrates memoization. Changing dummy counters updates state instantly without re-processing expensive code loops.",
+    practiceTask: "Implement a useCallback button callback to verify that children memo targets are not re-rendered on simple visual context state swaps.",
+    commonMistakes: "Wrapping simple, lightweight operations in useMemo or useCallback. Caching values has its own overhead, so excessive memoization can actually degrade performance.",
+    interviewQuestion: "What is Referental Equality in JavaScript, and how does it relate to the useCallback dependency checking arrays?",
     miniQuiz: {
-      question: "When should you use the useCallback hook in your React development tasks?",
+      question: "Which of the following optimization tools prevents functional components from re-rendering if their input props are identical?",
       options: [
-        "On every function defined inside standard screens",
-        "To fetch JSON databases over external secure paths",
-        "When passing callbacks to optimized children components that rely on reference equality to prevent unwanted visual cycles",
-        "When setting state arrays in local storage keys"
+        "React.useRef",
+        "React.useCallback",
+        "React.memo",
+        "React.useLayoutEffect"
       ],
       answerIndex: 2,
-      explanation: "useCallback maintains constant callback reference pointers. When passed down as props to children components wrapped in React.memo, it avoids unnecessary child rerenders."
+      explanation: "React.memo is a higher-order component container that shallowly compares component props, skipping re-renders if no changes are detected."
+    }
+  },
+  {
+    id: "protected-auth-routes",
+    title: "12. Secure Client Access & Protected Routes",
+    level: "Advanced",
+    estimate: "20 mins",
+    description: "Construct navigation security layouts and role validate administrative access to cloud system nodes.",
+    explanation: "Protecting sensitive interfaces requires server state alignment and client guards. Safe authorization utilizes secure tokens alongside React Context providers which instantly redirect guests attempting illegal routing access.",
+    syntax: "if (!user || !user.email.endsWith('@company.com')) return <Redirect />;",
+    code: `import React, { useState } from 'react';
+
+export default function ClientGatewaySimulator() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [securedData, setSecuredData] = useState<string | null>(null);
+
+  const fetchSecureDatabasePayload = () => {
+    if (!isAdmin) {
+      setSecuredData("CRITICAL EXCEPTION: Permission Denied. Access Token Missing.");
+      return;
+    }
+    setSecuredData("DATABASE STACK STATUS: NORMAL \\nKEY_ID: 88506113156 \\nSERVER: ACTIVE");
+  };
+
+  return (
+    <div className="p-6 border-4 border-black bg-stone-900 text-stone-200 font-mono shadow-[4px_4px_0px_rgba(0,0,0,1)] max-w-2xl mx-auto">
+      <div className="flex items-center justify-between border-b-2 border-stone-800 pb-3 mb-4">
+        <h3 className="text-white font-black text-xs uppercase uppercase">Gate Security Module</h3>
+        <span className={\`text-[9px] font-black px-2 py-0.5 border \${
+          isAdmin ? 'bg-[#00FF00] text-black border-black' : 'bg-red-500 text-white border-red-700'
+        }\`}>
+          {isAdmin ? "PRIVILEGED SESSION" : "GUEST CREDENTIAL"}
+        </span>
+      </div>
+
+      <div className="space-y-4 text-xs">
+        <p className="text-[10px] text-stone-400 font-bold leading-relaxed">
+          Toggle simulation mode to see how Client routing security acts on unverified tokens:
+        </p>
+        
+        <div className="flex gap-2">
+          <button 
+            type="button"
+            onClick={() => { setIsAdmin(true); setSecuredData(null); }}
+            className="flex-1 bg-zinc-800 border-2 border-black hover:bg-neutral-850 text-white font-black py-1 px-1.5 cursor-pointer uppercase text-[9px]"
+          >
+            Authenticate Admin
+          </button>
+          <button 
+            type="button"
+            onClick={() => { setIsAdmin(false); setSecuredData(null); }}
+            className="flex-1 bg-red-800/20 border-2 border-red-900 hover:bg-red-800/40 text-red-400 font-black py-1 px-1.5 cursor-pointer uppercase text-[9px]"
+          >
+            Revoke Access
+          </button>
+        </div>
+
+        <button 
+          onClick={fetchSecureDatabasePayload}
+          className="w-full bg-yellow-300 hover:bg-yellow-400 border-2 border-black text-black font-black uppercase text-[10px] py-1.5 transition-all cursor-pointer"
+        >
+          🔑 Fetch Secured Administrative Node Data
+        </button>
+
+        {securedData && (
+          <pre className={\`p-3 border-2 text-[10px] leading-relaxed overflow-x-auto whitespace-pre \${
+            securedData.includes("CRITICAL") ? 'bg-red-950/40 border-red-900 text-red-400' : 'bg-[#00FF00]/10 border-[#00FF00]/40 text-[#00FF00]'
+          }\`}>
+            {securedData}
+          </pre>
+        )}
+      </div>
+    </div>
+  );
+}`,
+    outputExplanation: "Enforces a clear gate lock simulation. Fetch logs return 403 errors unless authorization credentials are authenticated successfully.",
+    practiceTask: "Implement a secondary condition restricting operations unless the simulated account matches specific company domain metrics.",
+    commonMistakes: "Trusting database filtering solely to client javascript states, allowing attackers to access secure endpoints via inspection tools.",
+    interviewQuestion: "What is JWT token verification, and why should signature verification always occur on server-side modules?",
+    miniQuiz: {
+      question: "Which strategy guarantees proper security when protecting administrative interfaces?",
+      options: [
+        "Keeping endpoints visible and hiding components in HTML with display:none",
+        "Checking security access conditions both in the client state and through database rules",
+        "Writing admin credentials inside client constant files",
+        "Clearing local storage states on page refresh"
+      ],
+      answerIndex: 1,
+      explanation: "Security must be end-to-end: client navigation blocks enhance user experience, but server rules enforce security gates."
     }
   }
 ];

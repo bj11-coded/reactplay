@@ -7,13 +7,15 @@ type LearnProps = {
   setSelectedLessonId: (id: string) => void;
   isLessonCompleted: (id: string) => boolean;
   percentCompleted: number;
+  allLessons?: Lesson[];
 };
 
 export default function Learn({
   setCurrentTab,
   setSelectedLessonId,
   isLessonCompleted,
-  percentCompleted
+  percentCompleted,
+  allLessons = lessonsData
 }: LearnProps) {
 
   const levels: { name: Level; title: string; desc: string; accentBorder: string; badgeBg: string }[] = [
@@ -73,9 +75,18 @@ export default function Learn({
       </div>
 
       {/* Levels Tracks Grid */}
-      <div className="space-y-16">
-        {levels.map((lvl) => {
-          const levelLessons = lessonsData.filter((i) => i.level === lvl.name);
+      {allLessons.length === 0 ? (
+        <div className="border-4 border-dashed border-black bg-white p-12 text-center max-w-xl mx-auto shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] my-12" id="empty-state-lessons">
+          <BookOpen className="mx-auto mb-4 text-black fill-[#00FF00] stroke-[2.5]" size={44} />
+          <h3 className="font-display font-black text-lg text-black uppercase tracking-tight">Syllabus Directory is Empty</h3>
+          <p className="font-sans text-xs text-[#555] mt-2 font-bold leading-relaxed">
+            No engineering lessons have been added yet. Please click the **Admin** tab at the top to write and publish real lessons directly from the dashboard!
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-16">
+          {levels.map((lvl) => {
+            const levelLessons = allLessons.filter((i) => i.level === lvl.name);
 
           return (
             <div key={lvl.name} className="space-y-6">
@@ -160,6 +171,7 @@ export default function Learn({
           );
         })}
       </div>
+      )}
 
     </div>
   );

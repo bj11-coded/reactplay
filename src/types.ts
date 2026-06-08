@@ -7,6 +7,13 @@ export interface MiniQuiz {
   explanation: string;
 }
 
+export interface Subsection {
+  title: string;
+  content: string;
+  exampleCode?: string;
+  exampleExplanation?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -21,6 +28,7 @@ export interface Lesson {
   commonMistakes: string;
   interviewQuestion: string;
   miniQuiz: MiniQuiz;
+  subsections?: Subsection[];
 }
 
 export interface Snippet {

@@ -1,147 +1,160 @@
 import { QuizQuestion } from "../types";
 
 export const quizzesData: QuizQuestion[] = [
-  // JSX QUIZ
   {
-    id: "jsx-1",
-    question: "What is JSX under the hood in React?",
+    id: "q1-react-vdom",
+    topic: "1. Introduction & JSX",
+    question: "What is the primary architectural function of the React Virtual DOM?",
     options: [
-      "Pure static HTML that is packaged up inside bundle assets",
-      "A syntax extension representing React.createElement() calls that compilations turn into native JS objects",
-      "A direct instruction to parse variables utilizing external standard query strings",
-      "An alternative dialect of XML exclusively for Webpack engines"
+      "To compile static CSS templates directly into browser rendering layers",
+      "To maintain a lightweight in-memory representation of the UI and surgically diff updates, minimizing expensive real DOM writes",
+      "To bypass JavaScript execution and force browsers to direct rendering on the GPU",
+      "To store user settings across browser restarts inside cloud Firestore nodes"
     ],
     answerIndex: 1,
-    explanation: "JSX compiles down to nested JS function statements (React.createElement). It creates standard JavaScript objects representing the desired DOM layout.",
-    topic: "JSX Quiz"
+    explanation: "React maintains a replica of the real DOM in memory called the Virtual DOM. When state changes, React diffs the old virtual tree with a new one and calculates the minimal set of operations to perform on the real browser DOM, which heavily optimizes screen performance."
   },
   {
-    id: "jsx-2",
-    question: "Why can't custom components be rendered with lowercase first letters in JSX?",
+    id: "q2-component-types",
+    topic: "2. Functional vs Class Components",
+    question: "Which of the following describes a key advantage of Functional Components over ES6 Class Components?",
     options: [
-      "Because lowercase elements crash browser engines on boot",
-      "Because React reserves lowercase strings to identify standard web tags like main, section, or div",
-      "Because lowercase parameters take double the compilation times",
-      "Capital letters are simply used to make code look clean"
+      "Functional components compile down to slower, sandbox-heavy code loops",
+      "Functional components completely eliminate the constructor overhead and the complex scoping binds of the 'this' keyword",
+      "Class components are the only models allowed to declare internal states",
+      "Functional components force developers to define XML properties in separate files"
     ],
     answerIndex: 1,
-    explanation: "To differentiate standard DOM elements (like <div>, <span>) from custom components (like <WelcomeMessage>), React relies on lowercase vs uppercase identifiers.",
-    topic: "JSX Quiz"
+    explanation: "ES6 Class components require boilerplate constructor patterns and explicit binding of methods because of the dynamic scopes of the JavaScript 'this' context. Functional components with hooks are simpler, cleaner, and optimize better during compilation build steps."
   },
-
-  // COMPONENTS QUIZ
   {
-    id: "comp-1",
-    question: "What is the key criteria of a pure React custom functional component?",
+    id: "q3-data-flow",
+    topic: "3. Props, PropTypes, & Prop Drilling",
+    question: "What does the term 'Prop Drilling' mean in a React component architecture?",
     options: [
-      "It must be registered with the browser's CustomElementRegistry",
-      "It must be a JavaScript function that starts with a capital letter and returns JSX elements",
-      "It should always use absolute position properties for css layouts",
-      "It has to be stored inside a serverless cloud instance"
+      "Automatically compiling HTML tags down to server-side databases",
+      "Passing read-only prop values down through multiple intermediate nesting levels that don't need the data, solely to reach a deep child",
+      "Injecting dynamic style parameters into layout cards via CSS Grid classes",
+      "Editing package dependencies dynamically inside the developer console"
     ],
     answerIndex: 1,
-    explanation: "React components are standard JS functions that begin with a capital letter, accepts optional props, and return renderable JSX constructs.",
-    topic: "Components Quiz"
+    explanation: "Prop Drilling is the process of thread-passing props through several layers of descendant components simply to deliver them to a nested child. It can be resolved by using the React Context API or external state managers like Redux."
   },
-
-  // PROPS QUIZ
   {
-    id: "props-1",
-    question: "Can a React child component safely modify its own received props object directly?",
+    id: "q4-state-binding",
+    topic: "4. State & One-Way Data Binding",
+    question: "How does one-way (unidirectional) data binding function inside a React app?",
     options: [
-      "Yes, props operate as standard local variables inside functional scopes",
-      "No, props represent immutable, read-only values to uphold predictable single-direction data flows",
-      "Only if the parent allows permission triggers inside useEffect parameters",
-      "Yes, but only strings are allowed to be replaced"
+      "Inputs update state directly, and state updates inputs in a circular thread, causing infinite render cascades",
+      "Data strictly flows downward from parent to child via props, and client changes must be explicitly propagated back via events/callbacks",
+      "Page components can only communicate with other components via external servers",
+      "CSS is forbidden from overriding custom HTML layout models"
     ],
     answerIndex: 1,
-    explanation: "Props are strictly read-only. Modifying passed parameters directly destroys state predictability, leading to severe visual bugs.",
-    topic: "Props Quiz"
+    explanation: "React features unidirectional data flow: parent state flows down to children as read-only props. To modify parent state from a child, the parent must pass down a callback function that the child triggers on events, preserving predictable data tracking."
   },
   {
-    id: "props-2",
-    question: "How can deep children components deliver updated information back upwards to parents?",
+    id: "q5-lists-keys",
+    topic: "5. Conditional Rendering & Lists",
+    question: "Why does React require a unique 'key' prop when rendering lists of elements dynamically?",
     options: [
-      "By overwriting general browser history stacks",
-      "By executing passed down parent callback functions containing argument payloads",
-      "By throwing custom HTTP exceptions inside their return scopes",
-      "By using global CSS document variables"
-    ],
-    answerIndex: 1,
-    explanation: "Parents can pass down trigger functions as props. When a child executes those callbacks with arguments, the parent captures the call and mutates its own local state values.",
-    topic: "Props Quiz"
-  },
-
-  // STATE QUIZ
-  {
-    id: "state-1",
-    question: "What happens if you mutate a state variable directly (e.g. user.name = 'Mark') instead of using the designated setter callback?",
-    options: [
-      "React throws a critical compilation error blocks instantly",
-      "Nothing changes inside the variable itself",
-      "The value updates in memory, but React misses the action and fails to trigger any visual re-rendering cycles on screens",
-      "Browser tabs lock immediately to prevent memory leaks"
+      "To provide the parent container with background styles matching standard layout grids",
+      "To compile elements into server-side databases automatically",
+      "To help React identify which items have changed, been added, or been removed, optimizing Virtual DOM reconciliation",
+      "To lock input elements from being updated by standard user actions"
     ],
     answerIndex: 2,
-    explanation: "Direct assignment side-steps the state dispatcher completely, meaning React remains unaware that a value has changed, leading to a stale UI.",
-    topic: "State Quiz"
+    explanation: "During the Virtual DOM diffing process (reconciliation), unique keys allow React to identify which components are persistent or replaced. This prevents React from tearing down and recreating entire list elements when only one item's position changes."
   },
-
-  // HOOKS QUIZ
   {
-    id: "hooks-1",
-    question: "What are the two major rules of hooks in React?",
+    id: "q6-forms-controlled",
+    topic: "6. React Forms & Controlled Inputs",
+    question: "What is a 'Controlled Component' when implementing forms in React?",
     options: [
-      "They must be imported using dynamic import() models and run inside loop branches",
-      "Only call hooks at the top level of custom functional components or custom hooks, and never run them inside loops, condition blocks, or nested functions",
-      "Hooks must be registered inside package.json files and execute only at dawn",
-      "They must return numerical arrays and take null targets"
+      "A component controlled exclusively by external Redux store modules",
+      "A form element whose value is driven by React state, with updates handled via synchronous onChange callbacks",
+      "A layout element protected behind security auth gateways inside routers",
+      "A button that disables itself after a single click event"
     ],
     answerIndex: 1,
-    explanation: "React relies on the call order of hooks to link state nodes mapped to clean renders. Calling them inside loops or condition blocks disrupts this matching sequence, causing critical system glitches.",
-    topic: "Hooks Quiz"
+    explanation: "A controlled component is a form element (like an input) whose visible value is bound to React state. When the user types, an event handler updates State, which in turn feeds the updated value back to the input, making React the single source of truth."
   },
   {
-    id: "hooks-2",
-    question: "What occurs if you call useEffect and omit the dependency array completely (e.g. useEffect(() => {}))?",
+    id: "q7-hooks-effect",
+    topic: "7. React Hooks & Lifecycles",
+    question: "Which of the following dependencies array configurations simulates a classical 'componentDidMount' using modern useEffect hooks?",
     options: [
-      "The layout effect behaves as inactive and is never parsed",
-      "The hook functions only when parent routes are updated",
-      "The effect executes repeatedly on *EVERY SINGLE* paint render cycle",
-      "It behaves exactly the same as providing an empty array []"
+      "Omitting the dependency array entirely: useEffect(() => {})",
+      "Providing an empty dependency array: useEffect(() => {}, [])",
+      "Configuring local boolean indicators inside arrays: useEffect(() => {}, [true])",
+      "Providing the component name itself inside the array context"
+    ],
+    answerIndex: 1,
+    explanation: "An empty dependency array `[]` tells React that the effect does not rely on any reactive state or prop variables. Consequently, the effect executes exactly once when the component initially mounts, resembling the behavior of 'componentDidMount'."
+  },
+  {
+    id: "q8-context-api",
+    topic: "8. Context API & Uplifting State",
+    question: "What does the React Context API resolve in large component trees?",
+    options: [
+      "It compiles raw JavaScript expressions directly to visual SVG charts",
+      "It bypasses the react-router-dom library during route changes",
+      "It provides a mechanism to share global states across deeply nested components without passing props down manually via prop drilling",
+      "It blocks unauthorized guest users from viewing active sidebar tabs"
     ],
     answerIndex: 2,
-    explanation: "An omitted dependency array means React has no triggers to compare against. Thus, it runs the effect callback after every render, which can easily trigger infinite loops.",
-    topic: "Hooks Quiz"
+    explanation: "Context API provides a way to pass data down the component tree without needing to manually drill props through every intermediate child. A Provider wraps ancestor nodes, and any descendant can consume the context using the useContext hook."
   },
-
-  // ROUTING QUIZ
   {
-    id: "route-1",
-    question: "How does a standard SPA client router work inside browser tabs?",
+    id: "q9-custom-hooks",
+    topic: "9. Custom Hook Architecture",
+    question: "Which rule is mandatory when designing and naming Custom React Hooks?",
     options: [
-      "By ordering complete page document reloads from servers on every navigation click",
-      "By intercepting standard click events, updating the URL bar with window.history, and selectively rendering correct component grids dynamically without reload cycles",
-      "By establishing SSH tunnels directly with hosting clouds",
-      "By using special hardware-based chip redirection"
+      "They must be named starting with the lowercase prefix 'use'",
+      "They can only be called inside standard classical constructors",
+      "They are required to return a JSX layout element or fragment",
+      "They must be declared inside separate external stylesheets"
+    ],
+    answerIndex: 0,
+    explanation: "Custom Hooks must start with the keyword 'use' (e.g., useLocalStorage, useFetch). This prefix signals to compiler linters that the function follows the Rules of Hooks, authorizing it to consume other Hooks internally."
+  },
+  {
+    id: "q10-state-redux",
+    topic: "10. State Management & Redux",
+    question: "How do Reducers, Actions, and Store operate inside a standard Redux transaction cycle?",
+    options: [
+      "Actions update the Store directly, which then calls Reducers to design layout files",
+      "Components dispatch standard declarative Actions, which Reducers process to generate a new immutable State inside the global Store",
+      "Reducers dispatch Stores to trigger actions in client layouts",
+      "The global store is bypassable by executing direct write commands inside HTML attributes"
     ],
     answerIndex: 1,
-    explanation: "Client routers intercept anchor clicks, use the HTML5 History API to alter URL endpoints, and instantly mount/unmount page visual sectors, preserving local component states beautifully.",
-    topic: "Routing Quiz"
+    explanation: "Redux has a strict unidirectional data flow: components notify of intent by dispatching an Action (an object describing what happened). The Store sends this to a pure Reducer function, which computes the brand new state immutably and notifies subscribers."
   },
-
-  // ADVANCED REACT QUIZ
   {
-    id: "adv-1",
-    question: "When is wrapping a child component inside React.memo beneficial?",
+    id: "q11-performance",
+    topic: "11. Performance & Memoization",
+    question: "When should a developer wrap a calculation inside the 'useMemo' hook?",
     options: [
-      "On every single component defined in the codebase to speed up file paths",
-      "When the child component is highly complex, renders frequently with the exact same props arrays, and undergoes heavy paint tasks",
-      "Only when compiling styles into inline styles",
-      "When using Tailwind CSS class prefixes inside client browsers"
+      "For lightweight, simple mathematical additions on every single render cycle",
+      "When cache-saving the results of computationally expensive of heavy loops depending on stable inputs to prevent redundant recalculation",
+      "To load background image files asynchronously into image cards",
+      "To force components to bypass standard security routing checks"
     ],
     answerIndex: 1,
-    explanation: "React.memo caches visual outputs. It should be used selectively when components are heavy and regularly suffer unnecessary re-renders with identical props. It adds small tracking overhead, so it's counter-productive for lightweight components.",
-    topic: "Advanced React Quiz"
+    explanation: "useMemo should be reserved for expensive calculations (e.g., parsing large datasets, sorting arrays) where recalculating on every single render would bottleneck performance. It stores the calculated value, only recomputing if dependencies change."
+  },
+  {
+    id: "q12-routing",
+    topic: "12. Client-Side Routing",
+    question: "Why should developers prefer the '<Link>' component from React Router over standard HTML anchor '<a>' tags for navigation?",
+    options: [
+      "Link components compile styles faster than standard anchor declarations",
+      "Link intercepts the click event, prevents standard browser page reload behaviors, and carries out in-memory routes, preserving state",
+      "Anchor tags are strictly prohibited inside responsive Tailwind structures",
+      "Link components automatically connect client profiles to Firestore databases"
+    ],
+    answerIndex: 1,
+    explanation: "Standard anchor <a> tags trigger a complete browser reload, wiping the clean memory state of the SPA. The React Router '<Link>' component overrides this default, pushing a history rewrite locally and shifting views instantly without dropping state."
   }
 ];
